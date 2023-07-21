@@ -13,5 +13,8 @@ interface LoginModel{
 export default {
     reqLogin(data:LoginModel){
         return request.post('/admin/acl/index/login',data)
+    },
+    reqGetInfo(){
+        return request.get(`/admin/acl/index/info`)
     }
 }

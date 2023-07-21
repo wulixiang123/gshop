@@ -11,7 +11,7 @@ interface LoginModel{
 }
 
 export default {
-    async reqLogin(data:LoginModel){
+    reqLogin(data:LoginModel){
         return request.post('/admin/acl/index/login',data)
     }
 }

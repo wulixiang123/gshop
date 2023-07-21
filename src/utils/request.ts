@@ -33,7 +33,7 @@ service.interceptors.response.use(
   /* 约束一下response */
 	async (response: AxiosResponse<ResponseData<any>>) => {
 		// 对响应数据做点什么
-		const res = response.data;
+		const res = response.data;//响应体
     if (res.code !== 20000 && res.code !== 200) { /* 成功数据的code值为20000/200 */
       // 统一的错误提示
       ElMessage({
@@ -53,7 +53,7 @@ service.interceptors.response.use(
 			}
 			return Promise.reject(service.interceptors.response);
 		} else {
-      return res.data; /* 返回成功响应数据中的data属性数据 */
+      		return res.data; /* 返回成功响应数据中的data属性数据 */
 		}
 	},
 	(error) => {

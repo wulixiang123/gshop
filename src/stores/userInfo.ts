@@ -16,7 +16,7 @@ export interface UserInfoState {
 const initUserinfo = ():UserInfoModel => ({
     avatar: '', // 头像
     name: '', // 名称
-    buttons: [], // 权限用
+    buttons: [], // 权限用  
     roles: [], // 权限用
     routes: [] // 权限用
 })
@@ -52,6 +52,8 @@ export const useUserInfoStore = defineStore('userInfo', {
       try {
         let result = await userinfoApi.reqGetInfo()
 
+        console.log(result);
+        
         // 存储个人信息(包括权限信息)
         this.userInfo = result
 

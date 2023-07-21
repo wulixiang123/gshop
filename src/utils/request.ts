@@ -12,7 +12,7 @@ interface ResponseData<T> {
 
 // 配置新建一个 axios 实例
 const service = axios.create({
-	baseURL: import.meta.env.VITE_API_URL,
+	baseURL: import.meta.env.VITE_API_URL,// 拿的是.env.development 这个文件中设置的环境变量
 	timeout: 50000,
 });
 

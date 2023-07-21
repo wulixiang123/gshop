@@ -4,6 +4,7 @@ import type { UserInfoState } from './interface';
 import {ElMessage} from 'element-plus'
 import {staticRoutes} from '@/router/routes'
 
+import userInfoApi from '@/api/userinfo'
 
 /**
  * 用户信息
@@ -17,23 +18,38 @@ export const useUserInfoStore = defineStore('userInfo', {
     avatar: '',
     menuRoutes: []
   }),
-
+  
 	actions: {
-    login (username: string, password: string) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (username==='admin' && password==='111111') {
-            const token = 'token-atguigu'
-            setToken(token)
-            this.token = token
-            resolve(token)
-          } else {
-            reject(new Error('用户名或密码错误!'))
-            ElMessage.error('用户名或密码错误!')
-          }
-        }, 1000)
-      })
+    async login(username:string,password:string){
+      try {
+        let {token} = await userInfoApi.reqLogin({username,password})
+        console.log(token);
+        
+        setToken(token)
+        this.token=token
+      } catch (error) {
+        console.log(error);
+        return Promise.reject(error)
+      }
     },
+  
+    
+
+    // login (username: string, password: string) {
+    //   return new Promise((resolve, reject) => {
+    //     setTimeout(() => {
+    //       if (username==='admin' && password==='111111') {
+    //         const token = 'token-atguigu'
+    //         setToken(token)
+    //         this.token = token
+    //         resolve(token)
+    //       } else {
+    //         reject(new Error('用户名或密码错误!'))
+    //         ElMessage.error('用户名或密码错误!')
+    //       }
+    //     }, 1000)
+    //   })
+    // },
 
     getInfo () {
       return new Promise((resolve, reject) => {

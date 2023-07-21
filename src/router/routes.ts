@@ -12,6 +12,14 @@ import type { RouteRecordRaw } from 'vue-router';
  * 静态路由（默认路由）
  */
  export const staticRoutes: Array<RouteRecordRaw> = [
+  {
+    path:'/test',
+    name:'Test',
+    component:()=>import('@/views/test/index.vue'),
+    meta:{
+      hidden:true
+    }
+  },
 	{
     path: '/login',
     name: 'Login',
@@ -43,6 +51,49 @@ import type { RouteRecordRaw } from 'vue-router';
         icon: 'ele-HomeFilled', 
       }
     }]
+  },
+
+  {
+    path: '/product',
+    component: () => import('@/layout/index.vue'),
+      meta: { 
+        title: '商品管理', 
+        icon: 'ele-GoodsFilled', 
+      },
+      children:[
+        {
+          path:'trademark',
+          name:'Trademark',
+          component:()=>import('@/views/product/trademark/index.vue'),
+          meta:{
+            title:'品牌管理'
+          }
+        },
+        {
+          path:'attrs',
+          name:'Attrs',
+          component:()=>import('@/views/product/attrs/index.vue'),
+          meta:{
+            title:'平台管理属性'
+          }
+        },
+        {
+          path:'spu',
+          name:'Spu',
+          component:()=>import('@/views/product/spu/index.vue'),
+          meta:{
+            title:'SPU管理'
+          }
+        },
+        {
+          path:'sku',
+          name:'Sku',
+          component:()=>import('@/views/product/sku/index.vue'),
+          meta:{
+            title:'SKU管理'
+          }
+        }
+      ]
   },
 
   /* 匹配任意的路由 必须最后注册 */

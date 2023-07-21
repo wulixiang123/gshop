@@ -4,22 +4,16 @@ import { getToken, removeToken, setToken } from '../utils/token-utils';
 // import type { UserInfoState } from './interface';
 import {ElMessage} from 'element-plus'
 import {staticRoutes} from '@/router/routes'
-import userinfoApi from '@/api/userinfo';
+import userinfoApi,{type UserInfoModel} from '@/api/userinfo';
 
 export interface UserInfoState {
   token: string;
-  userInfo: {
-    avatar: string, // 头像
-    name: string, // 名称
-    buttons: string[], // 权限用
-    roles: string[], // 权限用
-    routes: string[] // 权限用
-  },
+  userInfo: UserInfoModel
   menuRoutes: RouteRecordRaw[] // 用于生成导航菜单的路由列表
 }
 
-
-const initUserinfo = () => ({
+// 初始化个人信息
+const initUserinfo = ():UserInfoModel => ({
     avatar: '', // 头像
     name: '', // 名称
     buttons: [], // 权限用
@@ -76,8 +70,8 @@ export const useUserInfoStore = defineStore('userInfo', {
       } catch (error) {
         console.log(error);
       }finally{
-        removeToken()
-        this.token = ''
+        removeToken()// 删除local中保存的token
+        this.token = ''// 提交重置用户信息的mutation
         this.userInfo = initUserinfo()
       }
     }

@@ -5,19 +5,31 @@ import request from '@/utils/request'
 // login     POST     /admin/acl/index/login
 // logout    POST     /admin/acl/index/logout
 
-interface LoginModel{
+export interface LoginModel{
     username:string,
     password:string
 }
 
+export interface TokenModel{
+    token:string
+}
+
+export interface UserInfoModel {
+    avatar: string, // 头像
+    name: string, // 名称
+    buttons: string[], // 权限用
+    roles: string[], // 权限用
+    routes: string[] // 权限用
+  }
+
 export default {
     reqLogin(data:LoginModel){
-        return request.post('/admin/acl/index/login',data)
+        return request.post<any,TokenModel>('/admin/acl/index/login',data)        
     },
     reqGetInfo(){
-        return request.get(`/admin/acl/index/info`)
+        return request.get<any,UserInfoModel>(`/admin/acl/index/info`)
     },
     reqLogout(){
-        return request.post(`/admin/acl/index/logout`)
+        return request.post<any,null>(`/admin/acl/index/logout`)
     }
 }

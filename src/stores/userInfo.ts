@@ -19,6 +19,14 @@ export interface UserInfoState {
 }
 
 
+const initUserinfo = () => ({
+    avatar: '', // 头像
+    name: '', // 名称
+    buttons: [], // 权限用
+    roles: [], // 权限用
+    routes: [] // 权限用
+})
+
 
 /**
  * 用户信息
@@ -28,13 +36,7 @@ export const useUserInfoStore = defineStore('userInfo', {
 
   state: (): UserInfoState => ({
     token: getToken() as string,
-    userInfo: {
-      avatar: '',
-      name: '',
-      buttons: [],
-      roles: [],
-      routes: []
-    },
+    userInfo: initUserinfo(),
     menuRoutes: []
   }),
 
@@ -68,6 +70,18 @@ export const useUserInfoStore = defineStore('userInfo', {
       }
     },
 
+    async reset(){
+      try {
+        await userinfoApi.reqLogout()
+      } catch (error) {
+        console.log(error);
+      }finally{
+        removeToken()
+        this.token = ''
+        this.userInfo = initUserinfo()
+      }
+    }
+
 
     // login (username: string, password: string) {
     //   return new Promise((resolve, reject) => {
@@ -99,13 +113,13 @@ export const useUserInfoStore = defineStore('userInfo', {
     //   })
     // },
 
-    reset () {
-      // 删除local中保存的token
-      removeToken()
-      // 提交重置用户信息的mutation
-      this.token = ''
-      this.name = ''
-      this.avatar = ''
-    },
+    // reset () {
+    //   // 删除local中保存的token
+    //   removeToken()
+    //   // 提交重置用户信息的mutation
+    //   this.token = ''
+    //   this.name = ''
+    //   this.avatar = ''
+    // },
   },
 });

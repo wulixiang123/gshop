@@ -16,5 +16,8 @@ export default {
     },
     reqGetInfo(){
         return request.get(`/admin/acl/index/info`)
+    },
+    reqLogout(){
+        return request.post(`/admin/acl/index/logout`)
     }
 }

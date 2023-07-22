@@ -39,11 +39,11 @@
       width="50%"
     >
       
-      <el-form label-width="100px" class="cusform">
-        <el-form-item label="品牌名称">
-          <el-input placeholder="请输入品牌名称" v-model="tmData.tmName"></el-input>
+      <el-form label-width="100px" class="cusform" :model="tmData" :rules="rules" ref="(ruleFormRef)">
+        <el-form-item label="品牌名称" prop="tmName">
+          <el-input placeholder="请输入品牌名称" v-model.trim="tmData.tmName"></el-input>
         </el-form-item>
-        <el-form-item label="品牌LOGO">
+        <el-form-item label="品牌LOGO" prop="logoUrl">
           <!--
             上传流程：
             点击上传upload组件,弹出弹框,选择文件,
@@ -81,8 +81,8 @@
 
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="onSave">
+          <el-button @click="onCancel(ruleFormRef)">取消</el-button>
+          <el-button type="primary" @click="onSave(ruleFormRef)">
             确认
           </el-button>
         </span>
@@ -126,10 +126,42 @@
 // #endregion
 import trademarkApi, { type TMModel } from '@/api/trademark';
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox, type UploadProps } from 'element-plus';
-import { onMounted, ref } from 'vue';
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules, type UploadProps } from 'element-plus';
+import { onMounted, reactive, ref } from 'vue';
 import { cloneDeep } from 'lodash'
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
+
+// 自定义某个字段的校验规则
+const validateTmName = (rule: any, value: any, callback: any) => {
+  // 参数一: 规则
+  // 参数二: 值
+  // 参数三: callback() 调用代表校验通过
+  //          如果传入一个错误,代表校验不通过
+  if (!value) {
+    callback(new Error('请输入品牌名称'))
+  } else if (value.length < 2 || value.length > 10) {
+    callback(new Error('品牌长度必须在2到10之间'))
+  } else {
+    callback()
+  }
+}
+
+// 表单校验
+const ruleFormRef = ref<FormInstance>()// 拿el-form的组件实例
+const rules = reactive<FormRules<TMModel>>({
+  tmName:[
+  // 系统规则
+  // { required: true, message: '请输入品牌名称', trigger: 'blur' }, // trigger 触发方式 'blur'失焦触发 'change'变化且失焦触发
+  //   { min: 2, max: 10, message: '品牌名称为2到10个字符', trigger: 'blur' },
+  // 自定义校验规则
+  { validator: validateTmName, trigger: 'blur' }
+  ],
+  logoUrl: [
+    { required: true, message: '请上传品牌LOGO', trigger: 'change' },
+  ]
+})
+
+
 
 // 删除
 const deleteTm = (row:TMModel) => {
@@ -170,26 +202,36 @@ const editTm = (row: TMModel) => {
 // }
 
 // 保存
-const onSave = async () => {
-  console.log(tmData.value)
+const onSave = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate(async (vaild, fields) => { // 参数一vaild布尔值,true代表校验成功  参数二是一个校验字段的信息
 
-  if (tmData.value.id) { // 编辑保存
-    await trademarkApi.reqUpdate(tmData.value)
-  } else { // 新增保存
-    await trademarkApi.reqSave(tmData.value)
-  }
+    if (vaild) { // 校验通过
 
+      if (tmData.value.id) { // 编辑保存
+        await trademarkApi.reqUpdate(tmData.value)
+      } else { // 新增保存
+        await trademarkApi.reqSave(tmData.value)
+      }
 
-  ElMessage.success('保存成功')
+      ElMessage.success('保存成功')
 
-  onCancel()
-  getTMPage()
+      onCancel(formEl)
+
+      getTMPage() // 重新获取数据
+
+    }
+  })
 }
+
 // 取消
-const onCancel = () => {
+const onCancel = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
   dialogVisible.value = false // 弹框消失
 
   tmData.value = initTmData() // 初始化收集的表单
+
+  formEl.resetFields() // 重置表单校验
 }
 
 
@@ -213,7 +255,9 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
     ElMessage.error('图片上传失败,请重试')
     return
   }
-  tmData.value.logoUrl = response.data
+  tmData.value.logoUrl = response.data;//注意,这里要加分号,不然会被解析成函数
+
+  (ruleFormRef.value as FormInstance).validateField('logoUrl') // 让上传图片下面的红字消失
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -222,8 +266,6 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
     ElMessage.error('图片大小不能超过2M!')
-    return false
-  }else if(tmData.value){
     return false
   }
   return true

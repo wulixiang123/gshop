@@ -24,5 +24,8 @@ export default {
     },
     reqUpdate(data:TMModel){
         return request.put<any,null>(`/admin/product/baseTrademark/update`,data)
+    },
+    reqDelete(id:number){
+        return request.delete<any,number>(`/admin/product/baseTrademark/remove/${id}`)
     }
 }

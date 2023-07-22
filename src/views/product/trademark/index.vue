@@ -19,7 +19,7 @@
       <el-table-column  label="操作">
         <template #default="{row,$index}">
           <el-button type="warning" :icon="Edit" @click="editTm(row)">编辑</el-button>
-          <el-button type="danger" :icon="Delete">删除</el-button>
+          <el-button type="danger" :icon="Delete" @click="deleteTm(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -126,10 +126,29 @@
 // #endregion
 import trademarkApi, { type TMModel } from '@/api/trademark';
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
-import { ElMessage, type UploadProps } from 'element-plus';
+import { ElMessage, ElMessageBox, type UploadProps } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash'
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
+
+// 删除
+const deleteTm = (row:TMModel) => {
+  ElMessageBox.confirm(
+    `确定要删除${row.tmName}吗?`,
+    '警告',
+    {
+      confirmButtonText:'确认',
+      cancelButtonText:'取消',
+      type:'warning'
+    }
+  )
+  .then(async () => {
+    await trademarkApi.reqDelete(row.id as number)
+    ElMessage.success('删除成功')
+    getTMPage()
+  })
+}
+
 
 // 编辑
 const editTm = (row: TMModel) => {
@@ -164,6 +183,7 @@ const onSave = async () => {
   ElMessage.success('保存成功')
 
   onCancel()
+  getTMPage()
 }
 // 取消
 const onCancel = () => {

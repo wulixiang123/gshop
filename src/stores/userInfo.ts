@@ -30,45 +30,40 @@ export const useUserInfoStore = defineStore('userInfo', {
 
   state: (): UserInfoState => ({
     token: getToken() as string,
-    userInfo: initUserinfo(),
+    userInfo: initUserinfo(),//存储的各种信息
     menuRoutes: []
   }),
 
   actions: {
     async login(username: string, password: string) {
       try {
-        let {token} = await userinfoApi.reqLogin({ username, password })
-        console.log(token);
-        
-        setToken(token)
-        this.token = token
-
+        let result = await userinfoApi.reqLogin({ username, password })//验证账号密码
+        // console.log(result);
+        setToken(result.token)//设置token
+        this.token = result.token//赋值给state中的token
       } catch (error) {
         console.error(error)
         return Promise.reject(error)
       }
     },
+
+    
     async getInfo () {
       try {
-        let result = await userinfoApi.reqGetInfo()
-
-        console.log(result);
-        
-        // 存储个人信息(包括权限信息)
-        this.userInfo = result
-
-        // 根据权限信息展示侧边栏,目前写死
-        this.menuRoutes = staticRoutes
-        
+        let result = await userinfoApi.reqGetInfo()//获取到个人信息
+        // console.log(result);
+        this.userInfo = result// 存储个人信息(包括权限信息)
+        this.menuRoutes = staticRoutes// 根据权限信息展示侧边栏,目前写死
       } catch (error) {
         console.error(error)
         return Promise.reject(error)
       }
     },
+
 
     async reset(){
       try {
-        await userinfoApi.reqLogout()
+        await userinfoApi.reqLogout()//调用退出登录接口
       } catch (error) {
         console.log(error);
       }finally{

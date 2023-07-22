@@ -17,7 +17,6 @@ const whiteList = ['/login']
 router.beforeEach(async (to, from, next) => {
    // 在显示进度条
    NProgress.start()
-
    // 设置整个页面的标题
    document.title = getPageTitle(to.meta.title as string)
 
@@ -31,7 +30,7 @@ router.beforeEach(async (to, from, next) => {
       NProgress.done()
     } else { // 请求的不是登陆路由
       // 是否已经登陆
-      const hasLogin = !!userInfoStore.userInfo.name
+      const hasLogin = !!userInfoStore.userInfo.name//双感叹号判断对象是否存在
       // 如果已经登陆直接放行
       if (hasLogin) {
         next()

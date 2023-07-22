@@ -1,10 +1,6 @@
 // 封装api文件,所有和个人信息相关的接口都放这个文件
 import request from '@/utils/request'
 
-// info      GET      /admin/acl/index/info
-// login     POST     /admin/acl/index/login
-// logout    POST     /admin/acl/index/logout
-
 export interface LoginModel{
     username:string,
     password:string
@@ -23,13 +19,13 @@ export interface UserInfoModel {
   }
 
 export default {
-    reqLogin(data:LoginModel){
-        return request.post<any,TokenModel>('/admin/acl/index/login',data)        
+    reqLogin(data:LoginModel){//登录
+        return request.post<any,TokenModel>('/admin/acl/index/login',data)//data就是username与password
     },
-    reqGetInfo(){
+    reqGetInfo(){//获取信息
         return request.get<any,UserInfoModel>(`/admin/acl/index/info`)
     },
-    reqLogout(){
+    reqLogout(){//退出登录使用post请求
         return request.post<any,null>(`/admin/acl/index/logout`)
     }
 }

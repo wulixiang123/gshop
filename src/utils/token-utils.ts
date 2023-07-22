@@ -8,6 +8,7 @@ export function setToken(token: string) {
   return localStorage.setItem(TokenKey, token)
 }
 
+// 删除token
 export function removeToken() {
   return localStorage.removeItem(TokenKey)
 }

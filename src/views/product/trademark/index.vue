@@ -37,9 +37,10 @@
       v-model="dialogVisible"
       title="添加品牌"
       width="50%"
+      @close="onCancel(ruleFormRef)"
     >
       
-      <el-form label-width="100px" class="cusform" :model="tmData" :rules="rules" ref="(ruleFormRef)">
+      <el-form label-width="100px" class="cusform" :model="tmData" :rules="rules" ref="ruleFormRef">
         <el-form-item label="品牌名称" prop="tmName">
           <el-input placeholder="请输入品牌名称" v-model.trim="tmData.tmName"></el-input>
         </el-form-item>
@@ -82,9 +83,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="onCancel(ruleFormRef)">取消</el-button>
-          <el-button type="primary" @click="onSave(ruleFormRef)">
-            确认
-          </el-button>
+          <el-button type="primary" @click="onSave(ruleFormRef)">保存</el-button>
         </span>
       </template>
     </el-dialog>
@@ -147,24 +146,25 @@ const validateTmName = (rule: any, value: any, callback: any) => {
 }
 
 // 表单校验
-const ruleFormRef = ref<FormInstance>()// 拿el-form的组件实例
+const ruleFormRef = ref<FormInstance>() // 拿el-form的组件实例
 const rules = reactive<FormRules<TMModel>>({
-  tmName:[
-  // 系统规则
-  // { required: true, message: '请输入品牌名称', trigger: 'blur' }, // trigger 触发方式 'blur'失焦触发 'change'变化且失焦触发
-  //   { min: 2, max: 10, message: '品牌名称为2到10个字符', trigger: 'blur' },
-  // 自定义校验规则
-  { validator: validateTmName, trigger: 'blur' }
+  tmName: [
+    // 系统规则
+    // { required: true, message: '请输入品牌名称', trigger: 'blur' }, // trigger 触发方式 'blur'失焦触发 'change'变化且失焦触发
+    // { min: 2, max: 10, message: '品牌名称为2到10个字符', trigger: 'blur' },
+    // 自定义校验规则
+    { validator: validateTmName, trigger: 'blur' }
   ],
   logoUrl: [
     { required: true, message: '请上传品牌LOGO', trigger: 'change' },
-  ]
+  ],
 })
 
 
 
 // 删除
 const deleteTm = (row:TMModel) => {
+  // 双重校验
   ElMessageBox.confirm(
     `确定要删除${row.tmName}吗?`,
     '警告',
@@ -242,20 +242,20 @@ const initTmData = () => ({
   logoUrl: ''
 })
 let tmData = ref<TMModel>( initTmData() ) // 收集表单数据
-const dialogVisible = ref(false)//弹框默认消失
+const dialogVisible = ref(false)
 const addTrademark = () => {
-  dialogVisible.value = true//打开弹框
+  dialogVisible.value = true
 }
 // 新增上传飘红
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
   response, // 后端返回给我们的数据
   uploadFile // 文件的详细信息,名称,大小都有
 ) => {
-  if(response.code !== 200){
+  if (response.code != 200) {
     ElMessage.error('图片上传失败,请重试')
     return
   }
-  tmData.value.logoUrl = response.data;//注意,这里要加分号,不然会被解析成函数
+  tmData.value.logoUrl = response.data;
 
   (ruleFormRef.value as FormInstance).validateField('logoUrl') // 让上传图片下面的红字消失
 }

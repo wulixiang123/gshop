@@ -18,7 +18,7 @@
       </el-table-column>
       <el-table-column  label="操作">
         <template #default="{row,$index}">
-          <el-button type="warning" :icon="Edit">编辑</el-button>
+          <el-button type="warning" :icon="Edit" @click="editTm(row)">编辑</el-button>
           <el-button type="danger" :icon="Delete">删除</el-button>
         </template>
       </el-table-column>
@@ -128,18 +128,42 @@ import trademarkApi, { type TMModel } from '@/api/trademark';
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { ElMessage, type UploadProps } from 'element-plus';
 import { onMounted, ref } from 'vue';
+import { cloneDeep } from 'lodash'
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
+
+// 编辑
+const editTm = (row: TMModel) => {
+  tmData.value = cloneDeep(row) // 回显数据
+
+  dialogVisible.value = true // 弹出弹框
+}
+
+// // 保存
+// const onSave = async () => {
+//   console.log(tmData.value)
+//   if(tmData.value.tmName !== '' && tmData.value.logoUrl !== ''){
+//     await trademarkApi.reqSave(tmData.value)
+//     ElMessage.success('保存成功')
+//     onCancel()
+//   }else{
+//     ElMessage.error('内容或图片未上传!')
+//   }
+// }
 
 // 保存
 const onSave = async () => {
   console.log(tmData.value)
-  if(tmData.value.tmName !== '' && tmData.value.logoUrl !== ''){
+
+  if (tmData.value.id) { // 编辑保存
+    await trademarkApi.reqUpdate(tmData.value)
+  } else { // 新增保存
     await trademarkApi.reqSave(tmData.value)
-    onCancel()
-    ElMessage.success('保存成功')
-  }else{
-    ElMessage.error('内容或图片未上传!')
   }
+
+
+  ElMessage.success('保存成功')
+
+  onCancel()
 }
 // 取消
 const onCancel = () => {
@@ -165,6 +189,10 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
   response, // 后端返回给我们的数据
   uploadFile // 文件的详细信息,名称,大小都有
 ) => {
+  if(response.code !== 200){
+    ElMessage.error('图片上传失败,请重试')
+    return
+  }
   tmData.value.logoUrl = response.data
 }
 

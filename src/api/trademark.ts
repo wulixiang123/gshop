@@ -21,5 +21,8 @@ export default {
     },
     reqSave(data:TMModel){
         return request.post<any,null>(`/admin/product/baseTrademark/save`,data)
+    },
+    reqUpdate(data:TMModel){
+        return request.put<any,null>(`/admin/product/baseTrademark/update`,data)
     }
 }

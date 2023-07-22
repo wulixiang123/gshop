@@ -41,18 +41,33 @@
       
       <el-form label-width="100px" class="cusform">
         <el-form-item label="品牌名称">
-          <el-input placeholder="请输入品牌名称"></el-input>
+          <el-input placeholder="请输入品牌名称" v-model="tmData.tmName"></el-input>
         </el-form-item>
         <el-form-item label="品牌LOGO">
+          <!--
+            上传流程：
+            点击上传upload组件,弹出弹框,选择文件,
+            当选择完文件之后,此时就开始上传
+            等待上传完毕之后,会拿到后端返回的图片url
+            拿到这个url之后,和form表单中的其他字段,组成一条 品牌数据, 点击保存传给后端
 
+
+            action="http://gmall-h5-api.atguigu.cn/admin/product/upload"
+            优点上线不用改
+            缺点如果后端服务的地址发生变化,这里需要改
+
+            action="/app-dev/admin/product/upload"
+            优点如果后端服务的地址发生变化,这里不需要改,只要改 vite 中 proxy 代理的url即可
+            缺点不能写死,上线需要改
+          -->
           <el-upload
             class="avatar-uploader"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :action="action"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <img v-if="tmData.logoUrl" :src="tmData.logoUrl" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
             <template #tip>
               <div class="el-upload__tip">
@@ -66,8 +81,8 @@
 
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">
+          <el-button @click="onCancel">取消</el-button>
+          <el-button type="primary" @click="onSave">
             确认
           </el-button>
         </span>
@@ -80,35 +95,87 @@
 </template>
 
 <script setup lang="ts">
+// #region
 // 1. 静态搭建
 // 2. 初始化数据展示
+//    api准备(固定搭配 - 写api的时候就写TS类型)
+//    页面初始化的调用api,拿数据,展示数据
+//    注意:
+//      el-table
+//          :data="tmList"   表格展示数据,应该是个数组
+//          border  边框
+//      el-table-column
+//          type="index"序号     type="selection"单选框
+//          label 表头
+//          width 宽度
+//          align="center"  列内容居中
+//          prop="tmName"   告诉当前列展示的是哪一个字段
+//          如果使用插槽,可以从作用域插槽中拿到 row(当前行展示的对象) 和 $index(当前行展示对象的下标)
 // 3. 交互
+//    3.1 翻页
+//        页码改变,组装数据发送请求
+//        每页条数改变,组装数据发送请求
+//    3.2 新增
+//        3.2.1 点击新增按钮弹出弹框
+//              弹框中的静态首先需要搭建完
+//        3.2.2 收集弹框表单数据
+//        3.2.3 点击保存,调用接口存数据
+//        3.2.4 点击取消,清空数据
+//    3.3 编辑
+//    3.4 删除
+// #endregion
 import trademarkApi, { type TMModel } from '@/api/trademark';
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { ElMessage, type UploadProps } from 'element-plus';
 import { onMounted, ref } from 'vue';
+const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
+
+// 保存
+const onSave = async () => {
+  console.log(tmData.value)
+  if(tmData.value.tmName !== '' && tmData.value.logoUrl !== ''){
+    await trademarkApi.reqSave(tmData.value)
+    onCancel()
+    ElMessage.success('保存成功')
+  }else{
+    ElMessage.error('内容或图片未上传!')
+  }
+}
+// 取消
+const onCancel = () => {
+  dialogVisible.value = false // 弹框消失
+
+  tmData.value = initTmData() // 初始化收集的表单
+}
+
 
 
 // 新增
-const dialogVisible = ref(false)
+const initTmData = () => ({
+  tmName: '',
+  logoUrl: ''
+})
+let tmData = ref<TMModel>( initTmData() ) // 收集表单数据
+const dialogVisible = ref(false)//弹框默认消失
 const addTrademark = () => {
-  dialogVisible.value = true
-} 
+  dialogVisible.value = true//打开弹框
+}
 // 新增上传飘红
-const imageUrl = ref('') // 图片预览url
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
-  response,
-  uploadFile
+  response, // 后端返回给我们的数据
+  uploadFile // 文件的详细信息,名称,大小都有
 ) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+  tmData.value.logoUrl = response.data
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   if (rawFile.type !== 'image/jpeg') {
-    ElMessage.error('Avatar picture must be JPG format!')
+    ElMessage.error('图片必须是JPG!')
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    ElMessage.error('图片大小不能超过2M!')
+    return false
+  }else if(tmData.value){
     return false
   }
   return true

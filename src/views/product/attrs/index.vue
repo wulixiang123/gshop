@@ -6,6 +6,7 @@
     </el-card>
 
     <el-card>
+      <!-- 新增/编辑 -->
       <div v-if="isEdit">
         <el-form inline>
           <el-form-item label="属性名">
@@ -55,7 +56,7 @@
           </el-table-column>
           <el-table-column label="操作" width="140">
             <template #default="{ row,$index }">
-              <el-button type="warning" :icon="Edit" size="small"></el-button>
+              <el-button type="warning" :icon="Edit" size="small" @click="editAttr(row)"></el-button>
               <el-button type="danger" :icon="Delete" size="small"></el-button>
             </template>
           </el-table-column>
@@ -88,7 +89,17 @@ import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import useCategoryStore from '@/stores/category'
 import { watch, ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import { cloneDeep } from 'lodash'
+
 const categoryStore = useCategoryStore()//接收到store中的数据
+
+
+// 编辑
+const editAttr = (row:AttrsModel) => {
+  isEdit.value = true// 切换编辑界面
+  attrsForm.value = cloneDeep(row)// 回显数据
+}
+
 
 // 保存
 const onSave = async () => {

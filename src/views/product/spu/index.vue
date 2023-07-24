@@ -4,12 +4,27 @@
       <CategorySelector :disabled="false"></CategorySelector>
     </el-card>
     <el-card>
-      <SpuList v-if="status == 1" @changeStatus="status = $event"></SpuList>
+      <!-- <SpuList v-if="status == 1" @changeStatus="status = $event"></SpuList>
       <SpuForm v-if="status == 2" @changeStatus="status = $event"></SpuForm>
-      <SkuForm v-if="status == 3" @changeStatus="status = $event"></SkuForm>
+      <SkuForm v-if="status == 3" @changeStatus="status = $event"></SkuForm> -->
+
+      <SpuList v-if="status == STATUS.SPULIST" v-model="status"></SpuList>
+      <SpuForm v-if="status == STATUS.SPUFORM" v-model="status"></SpuForm>
+      <SkuForm v-if="status == STATUS.SKUFORM" v-model="status"></SkuForm>
     </el-card>
   </div>
 </template>
+
+
+<script lang="ts">
+// 枚举
+export enum STATUS {
+  SPULIST = 1000,
+  SPUFORM = 2000,
+  SKUFORM = 3000
+}
+</script> 
+
 
 <script setup lang="ts">
 // SPU管理
@@ -25,7 +40,7 @@ import SkuForm from './components/SkuForm/index.vue'
 import { ref } from 'vue';
 
 // 1是主列表  2是新增Spu  3是新增Sku
-const status = ref(1) // 默认展示主列表
+const status = ref(STATUS.SPULIST) // 默认展示主列表
 
 
 </script>

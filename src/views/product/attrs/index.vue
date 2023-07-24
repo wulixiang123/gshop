@@ -2,19 +2,19 @@
   <div class="attrs">
     
     <el-card class="mb-10">
-      <CategorySelector></CategorySelector>
+      <CategorySelector :disabled="isEdit"></CategorySelector>
     </el-card>
 
     <el-card>
       <div v-if="isEdit">
         <el-form inline>
           <el-form-item label="属性名">
-            <el-input placeholder="请输入属性名" v-model="attrsForm.attrName"></el-input>
+            <el-input placeholder="请输入属性名" v-model.trim="attrsForm.attrName"></el-input>
           </el-form-item>
         </el-form>
 
         <div class="mb-10">
-          <el-button type="primary" @click="addAttrVal">添加属性值</el-button>
+          <el-button type="primary" @click="addAttrVal" :disabled="!attrsForm.attrName">添加属性值</el-button>
           <el-button @click="onCancel">取消</el-button>
         </div>
 
@@ -23,20 +23,23 @@
           <el-table-column label="属性值名称" prop="valueName"></el-table-column>
           <el-table-column label="操作" width="80">
             <template #default="{row,$index}">
-              <el-button type="danger" :icon="Delete" size="small"></el-button>
+              <el-button type="danger" :icon="Delete" size="small"
+              @click="deleteAttrValue($index)"
+              ></el-button>
             </template>
           </el-table-column>
         </el-table>
 
         <div>
-          <el-button type="primary" @click="onSave">保存</el-button>
+          <el-button type="primary" @click="onSave" :disabled="!(attrsForm.attrName && attrsForm.attrValueList.length)">保存</el-button>
           <el-button @click="onCancel">取消</el-button>
         </div>
       </div>
 
       <!-- 主列表 -->
       <div v-else>
-        <el-button type="primary" :icon="Plus" class="mb-10" @click="isEdit = true">添加属性</el-button>
+        <el-button type="primary" :icon="Plus" class="mb-10" :disabled="!categoryStore.category3Id" @click="isEdit = true"
+        >添加属性</el-button>
         <el-table :data="attrs" border>
           <el-table-column label="序号" type="index" width="80" align="center"></el-table-column>
           <el-table-column label="属性名" prop="attrName" width="160"></el-table-column>
@@ -108,8 +111,12 @@ const addAttrVal = () => {
   attrsForm.value.attrValueList.push({
     valueName:`哦吼-${Date.now()}`
   })
-  debugger
   console.log(attrsForm.value);
+}
+
+// 删除属性值
+const deleteAttrValue = (index:number) => {
+  attrsForm.value.attrValueList.splice(index,1)
 }
 
 // 用一个布尔值控制新增和编辑

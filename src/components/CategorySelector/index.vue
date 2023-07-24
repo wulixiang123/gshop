@@ -1,5 +1,5 @@
 <template>
-  <el-form inline>
+  <el-form inline :disabled="disabled">
 
     <el-form-item label="一级分类">
       <!-- 在select没有写v-model的时候,是选不中的 -->
@@ -58,10 +58,13 @@ import { onMounted } from 'vue'
 import useCategoryStore from '@/stores/category'
 const categoryStore = useCategoryStore() // 拿到store中的数据
 
+defineProps<{
+  disabled:boolean
+}>()
+
 const getCategory1List = () => {
   categoryStore.getCategory1List()
 }
-
 
 
 onMounted(() => {

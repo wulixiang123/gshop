@@ -265,7 +265,7 @@ watch(() => categoryStore.category3Id, (nval) => {
   } else { // 没有数据不发请求,清空数据
     attrs.value = []
   }
-})
+},{immediate:true})
 
 
 

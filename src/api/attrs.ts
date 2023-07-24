@@ -23,5 +23,8 @@ export default{
     },
     reqSaveAttrInfo(data:AttrsModel){
         return request.post<any,null>(`/admin/product/saveAttrInfo`, data)
+    },
+    reqDeleteAttr(attrId: number){
+        return request.delete<any,null>(`/admin/product/deleteAttr/${attrId}`)
     }
 }

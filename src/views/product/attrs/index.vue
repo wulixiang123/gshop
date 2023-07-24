@@ -21,7 +21,24 @@
 
         <el-table :data="attrsForm.attrValueList" border class="mb-10">
           <el-table-column type="index" label="序号" width="80" align="center"></el-table-column>
-          <el-table-column label="属性值名称" prop="valueName"></el-table-column>
+          <el-table-column label="属性值名称">
+            <template #default="{row,$index}">
+              <!--
+                这里不能用一个布尔值控制input的显示和隐藏,应该是每一行单独去控制input的显示和隐藏
+              -->
+              <el-input
+              v-if="row.inputVisible"
+              v-model.trim="row.valueName"
+              size="small"
+              @blur="hideInput(row,$index)"
+              ref="inputRef"
+              ></el-input>
+              <div
+              v-else
+              @click="showInput(row)"
+              >{{ row.valueName }}</div>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="80">
             <template #default="{row,$index}">
               <el-button type="danger" :icon="Delete" size="small"
@@ -57,7 +74,12 @@
           <el-table-column label="操作" width="140">
             <template #default="{ row,$index }">
               <el-button type="warning" :icon="Edit" size="small" @click="editAttr(row)"></el-button>
-              <el-button type="danger" :icon="Delete" size="small"></el-button>
+
+              <el-popconfirm :title="`确认要删除[${ row.attrName }]吗?`" @confirm="deleteAttr(row)">
+                <template #reference>
+                  <el-button type="danger" :icon="Delete" size="small"></el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -81,17 +103,96 @@
 //            api准备 - 目的:为了知道我们提交给后端需要哪些数据
 //            收集数据
 //            点击保存,调用api,保存数据
-//    3.2 编辑
-//    3.3 删除
+//    3.2 给所有的按钮加限制条件
+//        3.2.1 主列表 - 添加属性按钮,只有在三级分类id有值的情况下才能点击
+//              :disabled="!categoryStore.category3Id"
+//        3.2.2 编辑界面 - 三级分类是禁用状态
+//              <CategorySelector :disabled="isEdit"></CategorySelector>
+//              disabled 组件内部需要接一下才能用
+//        3.2.3 添加属性值 按钮
+//              属性名有值才能点击"添加属性值"按钮
+//              :disabled="!attrsForm.attrName">添加属性值</el-button>
+//        3.2.4 新增保存
+//              必须属性名有值且属性值列表有值才能保存
+//              <el-button :disabled="!(attrsForm.attrName && attrsForm.attrValueList.length)">保存</el-button>
+//    3.3 编辑
+//        点击"编辑"按钮,切换界面显示,回显数据
+//        当再次点击"保存"提交保存即可
+//    3.4 删除
+//        注意: 双重校验
+//    3.5 编辑界面属性值表格中,属性值切换input
+//        3.5.1 先写 input 框已存在的数据进行编辑
+//          表格展示的数据是 attrsForm.attrValueList,展示的是属性值列表
+//            每一行是一个row,都是一个属性值对象
+//            每个row添加一个inputVisible(布尔值)来控制input框的显示和隐藏(每一行单独框)
+//            当点击"div"的时候,将当前row的inputVisible切换成true,展示input
+//            当input框失焦的时候,将当前row的inputVisible切换成false展示div
+//          此时已经把input的切换做完了,这里还有一个功能
+//          "自动聚焦"这个动能也许做,当input展示的时候,此时需要在input框中进行自动聚焦
+//            只有拿到input这个元素之后,才能让它聚焦,拿到元素通过ref拿即可
+//            注意: DOM更新显示input框是异步的,所有用nextTick
+//        3.5.2 再写新增一个属性值的时候展示逻辑
+//        注意:
+//            当input框进行失焦的时候
+//                  没有内容,此时应该把这条数据干掉 
+//                  当有重复的时候也应该改掉这条数据
 // #endregion
 import attrsApi, { type AttrsModel } from '@/api/attrs'
 import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import useCategoryStore from '@/stores/category'
-import { watch, ref } from 'vue';
+import { watch, ref, nextTick } from 'vue';
 import { ElMessage } from 'element-plus';
 import { cloneDeep } from 'lodash'
+import type { AttrsValueModel } from '@/api/attrs';
 
 const categoryStore = useCategoryStore()//接收到store中的数据
+
+// 获取当前展示的input元素
+const inputRef = ref<HTMLInputElement>()
+// 展示input
+const showInput = (row:AttrsValueModel)=>{
+  row.inputVisible = true//展示当前行的input
+  // DOM更新显示input框是异步的,所有用nextTick
+  nextTick(() => {
+    inputRef.value?.focus()
+  })
+}
+
+// 隐藏input
+const hideInput = (row:AttrsValueModel,index:number) => {
+  row.inputVisible = false// 隐藏当前行的input
+  if(!row.valueName){// 对输入的值进行非空校验
+    attrsForm.value.attrValueList.splice(index,1)// 删除表格为空的数据
+    return
+  }
+  // index是回调传参传过来的,是当前我们自己正在切换的row
+  // idx是循环 attrsForm.attrValueList 这个数组的下标
+  // 因为 row 一定在 attrsForm.attrValueList 这个数组中存在
+  // 此时当下标相等的时候,就是自己和自己对比,自己和自己一定是相等的,所以需要把自己排除掉
+  let isRepeat = attrsForm.value.attrValueList.some((item,idx)=>{
+    if(index == idx){// 把自己排除掉
+      return false
+    }else{
+      return row.valueName == item.valueName
+    }
+  })
+  if(isRepeat){
+    ElMessage.error('输入的值不能重复,请重试')
+    attrsForm.value.attrValueList.splice(index,1)
+    return
+  }
+}
+
+
+
+
+// 删除
+const deleteAttr = async (row: AttrsModel) => {
+await attrsApi.reqDeleteAttr(row.id as number)
+ElMessage.success('删除成功') // 给提示
+getList() // 重新获取列表数据
+}
+
 
 
 // 编辑
@@ -120,8 +221,15 @@ const onCancel = () => {
 // 添加属性值
 const addAttrVal = () => {
   attrsForm.value.attrValueList.push({
-    valueName:`哦吼-${Date.now()}`
+    valueName:'',
+    inputVisible:true// 默认添加新数据展示input框
   })
+    // DOM更新是异步的
+    nextTick(() => {
+    inputRef.value?.focus()
+  })
+
+
   console.log(attrsForm.value);
 }
 

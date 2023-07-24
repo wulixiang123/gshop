@@ -73,11 +73,11 @@
           </el-table-column>
           <el-table-column label="操作" width="140">
             <template #default="{ row,$index }">
-              <el-button type="warning" :icon="Edit" size="small" @click="editAttr(row)"></el-button>
+              <el-button type="warning" :icon="Edit" size="small" @click="editAttr(row)" title="编辑"></el-button>
 
               <el-popconfirm :title="`确认要删除[${ row.attrName }]吗?`" @confirm="deleteAttr(row)">
                 <template #reference>
-                  <el-button type="danger" :icon="Delete" size="small"></el-button>
+                  <el-button type="danger" :icon="Delete" size="small" title="删除"></el-button>
                 </template>
               </el-popconfirm>
             </template>

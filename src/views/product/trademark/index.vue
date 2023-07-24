@@ -35,7 +35,7 @@
 
       <el-dialog
       v-model="dialogVisible"
-      title="添加品牌"
+      :title="tmData.id ? '编辑品牌' : '添加品牌'"
       width="50%"
       @close="onCancel(ruleFormRef)"
     >
@@ -242,9 +242,9 @@ const initTmData = () => ({
   logoUrl: ''
 })
 let tmData = ref<TMModel>( initTmData() ) // 收集表单数据
-const dialogVisible = ref(false)
+const dialogVisible = ref(false)//弹框默认消失
 const addTrademark = () => {
-  dialogVisible.value = true
+  dialogVisible.value = true//打开弹框
 }
 // 新增上传飘红
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
@@ -277,13 +277,13 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 const page = ref(1)
 const limit = ref(3)
 const total = ref(0)
-const handleSizeChange = (val: number) => {
-  limit.value = val
-  getTMPage()
+const handleSizeChange = (val: number) => {//每页几条数据
+  // limit.value = val//因为有v-model 父或子组件有变化另一方也会变化
+  getTMPage()//重新发请求获取数据
 }
-const handleCurrentChange = (val: number) => {
-  page.value = val
-  getTMPage()
+const handleCurrentChange = (val: number) => {//点击哪页去哪页
+  // page.value = val
+  getTMPage()//重新发请求获取数据
 }
 
 
@@ -293,7 +293,7 @@ const getTMPage = async () => {
     let result = await trademarkApi.reqPage(page.value,limit.value)
     tmList.value = result.records
     total.value = result.total
-    console.log(tmList.value);
+    console.log(tmList.value);//{id: 1, tmName: '小米', logoUrl: 'http://39.98.123.211/group1/M00/03/D9/rBHu8mHmKC6AQ-j2AAAb72A3EO0942.jpg'}
     
   } catch (error) {
     console.error(error);

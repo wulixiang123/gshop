@@ -21,10 +21,12 @@ const useCategoryStore = defineStore('category', {
     category3Id: undefined, // 三级id
   }),
   actions: {
-    // 获取一级数据
+    // 获取一级数据 {id: 1, name: '图书、音像、电子书刊'}...
     async getCategory1List() {
       let result = await categoryApi.reqCategory1List()//拿到一级数据
       this.category1List = result
+      console.log(result);
+      
     },
     // 获取二级数据(一级分类id改变的时候,调用获取二级数据)
     async getCategory2List() {

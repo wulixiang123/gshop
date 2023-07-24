@@ -2,29 +2,33 @@
   <div class="attrs">
     
     <el-card class="mb-10">
+      <!-- :disabled 显示与隐藏 -->
       <CategorySelector :disabled="isEdit"></CategorySelector>
     </el-card>
 
     <el-card>
       <!-- 新增/编辑 -->
       <div v-if="isEdit">
-        <el-form inline>
+        <el-form inline><!-- inline 变成行内 -->
           <el-form-item label="属性名">
             <el-input placeholder="请输入属性名" v-model.trim="attrsForm.attrName"></el-input>
           </el-form-item>
         </el-form>
 
         <div class="mb-10">
-          <el-button type="primary" @click="addAttrVal" :disabled="!attrsForm.attrName">添加属性值</el-button>
+                                                          <!-- 有值取反是false  disabled是false的时候是不显示的 -->
+          <el-button type="primary" @click="addAttrVal" :disabled="!attrsForm.attrName" >添加属性值</el-button>
           <el-button @click="onCancel">取消</el-button>
         </div>
 
         <el-table :data="attrsForm.attrValueList" border class="mb-10">
           <el-table-column type="index" label="序号" width="80" align="center"></el-table-column>
           <el-table-column label="属性值名称">
-            <template #default="{row,$index}">
+            <template #default="{row,$index}"><!-- row是每一行的数据 $index用来获取当前循环的索引 -->
               <!--
                 这里不能用一个布尔值控制input的显示和隐藏,应该是每一行单独去控制input的显示和隐藏
+                下面的size="small" 是设置表单组件的尺寸的
+                @blur="hideInput(row,$index)"
               -->
               <el-input
               v-if="row.inputVisible"
@@ -49,6 +53,7 @@
         </el-table>
 
         <div>
+          <!-- 有任何一方没有值都为false -->
           <el-button type="primary" @click="onSave" :disabled="!(attrsForm.attrName && attrsForm.attrValueList.length)">保存</el-button>
           <el-button @click="onCancel">取消</el-button>
         </div>
@@ -56,6 +61,13 @@
 
       <!-- 主列表 -->
       <div v-else>
+              <!-- 加上disabled属性  disabled== true  :disabled="true" 
+              不加disabled属性 disabled== false :disabled="false"
+        -->
+        <!-- 
+          input undefined   false  true ==disabled
+          input 123         true    false == disabled
+         -->
         <el-button type="primary" :icon="Plus" class="mb-10" :disabled="!categoryStore.category3Id" @click="isEdit = true"
         >添加属性</el-button>
         <el-table :data="attrs" border>
@@ -147,42 +159,39 @@ import type { AttrsValueModel } from '@/api/attrs';
 
 const categoryStore = useCategoryStore()//接收到store中的数据
 
+
 // 获取当前展示的input元素
 const inputRef = ref<HTMLInputElement>()
 // 展示input
 const showInput = (row:AttrsValueModel)=>{
   row.inputVisible = true//展示当前行的input
-  // DOM更新显示input框是异步的,所有用nextTick
+  // DOM更新显示input框是异步的,所以用nextTick
   nextTick(() => {
-    inputRef.value?.focus()
+    inputRef.value?.focus()//设置焦点
   })
 }
 
 // 隐藏input
-const hideInput = (row:AttrsValueModel,index:number) => {
+const hideInput = (row:AttrsValueModel,$index:number) => {
   row.inputVisible = false// 隐藏当前行的input
   if(!row.valueName){// 对输入的值进行非空校验
-    attrsForm.value.attrValueList.splice(index,1)// 删除表格为空的数据
+    attrsForm.value.attrValueList.splice($index,1)// 删除表格为空的数据
     return
   }
-  // index是回调传参传过来的,是当前我们自己正在切换的row
+  // $index是回调传参传过来的,是当前我们自己正在切换的row
   // idx是循环 attrsForm.attrValueList 这个数组的下标
   // 因为 row 一定在 attrsForm.attrValueList 这个数组中存在
   // 此时当下标相等的时候,就是自己和自己对比,自己和自己一定是相等的,所以需要把自己排除掉
   let isRepeat = attrsForm.value.attrValueList.some((item,idx)=>{
-    if(index == idx){// 把自己排除掉
-      return false
-    }else{
-      return row.valueName == item.valueName
-    }
+    if($index == idx)return// 把自己排除掉
+    else{return row.valueName == item.valueName}
   })
   if(isRepeat){
     ElMessage.error('输入的值不能重复,请重试')
-    attrsForm.value.attrValueList.splice(index,1)
-    return
+    attrsForm.value.attrValueList.splice($index,1)
+    // return
   }
 }
-
 
 
 
@@ -194,11 +203,10 @@ getList() // 重新获取列表数据
 }
 
 
-
 // 编辑
 const editAttr = (row:AttrsModel) => {
   isEdit.value = true// 切换编辑界面
-  attrsForm.value = cloneDeep(row)// 回显数据
+  attrsForm.value = cloneDeep(row)// 回显数据 其实就是使用深拷贝还原原来的row
 }
 
 
@@ -214,7 +222,7 @@ const onSave = async () => {
 }
 
 const onCancel = () => {
-  isEdit.value = false//显示主列表
+  isEdit.value = false//隐藏主列表
   attrsForm.value = initAttrsForm()//清空收集的数据
 }
 
@@ -222,24 +230,22 @@ const onCancel = () => {
 const addAttrVal = () => {
   attrsForm.value.attrValueList.push({
     valueName:'',
-    inputVisible:true// 默认添加新数据展示input框
+    inputVisible:true// 展示添加新数据的input框
   })
-    // DOM更新是异步的
+    // DOM更新是异步的 这里的代码是等待DOM加载完毕后执行
     nextTick(() => {
-    inputRef.value?.focus()
+    inputRef.value?.focus()//设置焦点
   })
-
-
-  console.log(attrsForm.value);
 }
 
 // 删除属性值
 const deleteAttrValue = (index:number) => {
-  attrsForm.value.attrValueList.splice(index,1)
+  attrsForm.value.attrValueList.splice(index,1)//splice 按照下标 删除1个
 }
 
 // 用一个布尔值控制新增和编辑
-const isEdit = ref(false)
+const isEdit = ref(false)//默认不展示
+
 const initAttrsForm = () => ({
   attrName: '',
   attrValueList: [],
@@ -248,27 +254,24 @@ const initAttrsForm = () => ({
   categoryLevel: 3, // 我们只添加3级的,所以可以写死
 })
 const attrsForm = ref<AttrsModel>( initAttrsForm() )
-
 // 初始化数据
 const attrs = ref<AttrsModel[]>([]) // 存数据
+
 const getList = async () => {
   const { category1Id, category2Id, category3Id } = categoryStore
-
+  // debugger
   let result = await attrsApi.reqAttrsList(category1Id as number, category2Id as number, category3Id as number)
-
-  attrs.value = result
+  // debugger
+  attrs.value = result//将数据存入attrs中
 }
 
 watch(() => categoryStore.category3Id, (nval) => {
   if (nval) { // 有数据,发请求
     getList()
-  } else { // 没有数据不发请求,清空数据
-    attrs.value = []
+  } else { 
+    attrs.value = []// 没有数据不发请求,清空数据
   }
-},{immediate:true})
-
-
-
+},{immediate:true})//立即执行
 </script>
 
 <style scoped>

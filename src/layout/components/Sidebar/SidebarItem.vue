@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!item.meta || !item.meta.hidden">
+  <div v-if="!item.meta || !item.meta.hidden"><!--如果item.meta不存在或item.meta.hidden不存在，则显示该元素，否则不显示。-->
     <template v-if="hasOneShowingChild(item.children, item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">

@@ -7,11 +7,19 @@ import request from '@/utils/request'
 
 // 销售属性值类型
 export interface SpuSaleAttrValueModel {
+  id?: number,
+  isChecked?: null,
+  saleAttrName?: string,
+  spuId?: number,
+  // -----------------
   baseSaleAttrId: number
   saleAttrValueName: string
 }
 // 销售属性类型
 export interface SpuSaleAttrModel {
+  id?: number, // 新增不存在,保存过之后才有id
+  spuId?: number, // 新增不存在,保存过之后才有id
+  // -----------------
   baseSaleAttrId: number
   saleAttrName: string
   spuSaleAttrValueList: SpuSaleAttrValueModel[]
@@ -21,11 +29,15 @@ export interface SpuSaleAttrModel {
 }
 // 图片类型
 export interface SpuImageModel {
+  id?: number, // 新增不存在,保存过之后才有id
+  spuId?: number, // 新增不存在,保存过之后才有id
+  // ----------------
   imgName: string
   imgUrl: string,
   // ----------------
-  name?: string, // 前端使用,组装数据使用
+  name?: string, // 前端使用,组装数据使用(upload展示必须有)
   response?: any //  前端使用,组装数据使用
+  url?: string // 前端使用,组装数据使用(upload展示必须有)
 }
 // SPU类型
 export interface SpuModel {
@@ -61,5 +73,13 @@ export default {
   //保存spu
   reqSaveSpu(data: SpuModel) {
     return request.post<any, null>(`/admin/product/saveSpuInfo`, data)
+  },
+  // 编辑根据spu的id获取图片列表
+  reqSpuImageListBySpuId(spuId: number) {
+    return request.get<any, SpuImageModel[]>(`/admin/product/spuImageList/${ spuId }`)
+  },
+  // 编辑根据spu的id获取销售属性列表
+  reqSaleAttrListBySpuId(spuId: number) {
+    return request.get<any, SpuSaleAttrModel[]>(`/admin/product/spuSaleAttrList/${ spuId }`)
   }
 }

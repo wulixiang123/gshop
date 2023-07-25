@@ -130,6 +130,20 @@
 //        调用接口,成功之后,切换主列表显示
 //        取消保存,目前使用的是v-if展示当前组件,所以不需要清空 spuForm 这个数据
 //                 如果使用的是v-show就需要了
+// 4. 编辑
+//      在主列表点击"编辑"按钮,切换到spuForm组件,回显数据
+//      4.1 切换SpuForm组件展示(之前的逻辑就有)
+//      4.2 回显数据
+//          把SpuList组件点击的一条spu,也就主列表中表格的一行数据,一条row,传给父组件
+//          父组件接到SpuList要编辑的row(一条spu数据),再传给SpuForm组件
+//          SpuForm组件使用props接收传过来的spuInfo(传过来的一条spu)
+//          回显数据,此时传过来的spuInfo中 spuImageList 和 spuSaleAttrList 是null
+//            需要单独发请求拿 spuImageList 和 spuSaleAttrList 两个的数据
+//            封装api,判断当前的 props.spuInfo.id 是否存在,存在代表编辑,调用接口拿数据
+//            接口封装的时候,需要去改TS的类型(小心改错了)
+//          注意: 还有个报错,就是因为 props.spuInfo 中的 spuSaleAttrList 是null,而计算属性中用到了spuSaleAttrList.some
+//                null.some 报错了
+//          注意: 还没有编辑保存呢
 // #endregion
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { ElMessage, type InputInstance, type UploadProps, type UploadUserFile } from 'element-plus'
@@ -138,12 +152,15 @@ import { STATUS } from '../../index.vue'
 import trademarkApi, { type TMModel } from '@/api/trademark'
 import spuApi, { type SaleAttrModel, type SpuImageModel, type SpuModel, type SpuSaleAttrModel, type SpuSaleAttrValueModel } from '@/api/spu'
 import useCategoryStore from '@/stores/category'
+import {cloneDeep} from 'lodash'
 const categoryStore = useCategoryStore()
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
 const emits =  defineEmits<{
   (e: 'update:modelValue', status: number): void
 }>()
-
+const props = defineProps<{
+  spuInfo:SpuModel
+}>()
   const onSave = async() =>{
     // 组装数据
     // 三级分类(保存之前组装)
@@ -243,10 +260,7 @@ const handleClose = (spuSaleAttrValueList: SpuSaleAttrValueModel[], idx: number)
 
 
 // 图片上传相关内容 - 不报错,不漂红
-
 const spuImageList = ref<SpuImageModel[]>([])// 收集图片列表
-
-const fileList = ref<UploadUserFile[]>([]) // 图片列表
 const dialogImageUrl = ref('') // 预览的url
 const dialogVisible = ref(false) // 预览的布尔值,控制dialog显示隐藏
 
@@ -265,6 +279,7 @@ const handleSuccess:UploadProps['onSuccess'] = (
 
 // 删除的回调
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+  spuImageList.value = uploadFiles as any
   console.log(uploadFile, uploadFiles)
 }
 // 预览的回调
@@ -319,10 +334,42 @@ const saleAttrList = computed(()=>{// 页面中使用的下拉数据
   return newArr
 })
 
+
+// 编辑获取数据,图片列表
+const getSpuImageList = async () =>{
+  let result = await spuApi.reqSpuImageListBySpuId(spuForm.value.id!)
+  console.log('图片列表',result);
+  // 新增的时候使用的是一个单独的变量收集数据的,所以回显的时候也给这个单独的变量
+  // 注意: upload组件预览图片必须要 name 属性 和 url 属性
+  //      而请求回来的数据没有这两个属性,所以不显示
+  spuImageList.value = result.map(item=>{
+    return{
+      ...item,
+      name:item.imgName,
+      url:item.imgUrl
+    }
+  })
+}
+
+// 编辑获取数据
+const getSpuSaleAttrList = async () => {
+  let result = await spuApi.reqSaleAttrListBySpuId(spuForm.value.id!)
+  console.log('销售属性',result);
+  spuForm.value.spuSaleAttrList = result
+}
+
+
+
+
 // 初始化数据展示
 onMounted(()=>{
   getTrademarkList()
   getSaleAttrList()
+  if(props.spuInfo.id){
+    spuForm.value = cloneDeep(props.spuInfo)
+    getSpuImageList()
+    getSpuSaleAttrList()
+  }
 })
 
 

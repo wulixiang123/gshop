@@ -1,11 +1,11 @@
 <template>
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
-      <el-input placeholder="SPU名称" clearable></el-input>
+      <el-input placeholder="SPU名称" clearable v-model="spuForm.spuName"></el-input>
     </el-form-item>
 
     <el-form-item label="品牌">
-      <el-select>
+      <el-select v-model="spuForm.tmId">
         <el-option
         v-for="tm in tmList"
         :key="tm.id"
@@ -15,7 +15,7 @@
     </el-form-item>
 
     <el-form-item label="SPU描述">
-      <el-input type="textarea" placeholder="SPU描述" rows="3"></el-input>
+      <el-input type="textarea" placeholder="SPU描述" rows="3" v-model="spuForm.description"></el-input>
     </el-form-item>
 
     <el-form-item label="SPU图片">
@@ -77,13 +77,18 @@
 //    最终要收集到表单中的数据,点击保存,调用后端api传给后端数据
 //    3.1 准备保存api,知道我们要收集哪些数据
 //    3.2 收集数据
+//        创建一个变量用来收集数据
+//        3.2.1 收集普通数据 - 指可以直接使用v-model收集的数据
+//        3.2.2 收集图片列表(单独去做)
+//        3.2.3 收集销售属性(单独去做)
 // #endregion
 import { onMounted, ref } from 'vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { STATUS } from '../../index.vue'
 import trademarkApi, { type TMModel } from '@/api/trademark'
-import spuApi, { type SaleAtTrModel } from '@/api/spu'
+import spuApi, { type SaleAttrModel } from '@/api/spu'
+import type { SpuModel } from '@/api/spu'
   const emits =  defineEmits<{
     (e: 'update:modelValue', status: number): void
   }>()
@@ -103,6 +108,21 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 }
 
 
+
+// 创建数据-用来收集数据
+const initSpuForm = (): SpuModel => ({
+  category3Id: undefined, // 页面展示的时候,也可以在保存之前赋值
+  spuName: '',
+  description: '',
+  tmId: undefined,
+  spuSaleAttrList: [],
+  spuImageList: []
+})
+const spuForm = ref<SpuModel>(initSpuForm())
+
+
+
+
 // 获取品牌下拉
 const tmList = ref<TMModel[]>([])
 const getTrademarkList = async () => {
@@ -111,7 +131,7 @@ const getTrademarkList = async () => {
 }
 
 // 获取销售属性下拉
-const baseSaleAttrList = ref<SaleAtTrModel[]>([])
+const baseSaleAttrList = ref<SaleAttrModel[]>([])
 const getSaleAttrList = async () => {
   baseSaleAttrList.value = await spuApi.reqSaleAttrList()
 }

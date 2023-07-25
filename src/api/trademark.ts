@@ -27,5 +27,9 @@ export default {
     },
     reqDelete(id:number){
         return request.delete<any,number>(`/admin/product/baseTrademark/remove/${id}`)
+    },
+    // 获取品牌列表数据
+    reqTrademarkList(){
+        return request.get<any,TMModel[]>(`/admin/product/baseTrademark/getTrademarkList`)
     }
 }

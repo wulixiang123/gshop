@@ -19,8 +19,18 @@ export interface SpuPageModel{
   pages: number
 }
 
+export interface SaleAtTrModel{
+  id:number
+  name:string
+}
+
 export default {
+  // 获取spu分页数据
     reqSpuPage(page:number,limit:number,category3Id:number){
         return request.get<any,SpuPageModel>(`/admin/product/${page}/${limit}?category3Id=${category3Id}`)
+    },
+  // 获取销售属性数据列表
+    reqSaleAttrList(){
+      return request.get<any,SaleAtTrModel[]>(`/admin/product/baseSaleAttrList`)
     }
 }

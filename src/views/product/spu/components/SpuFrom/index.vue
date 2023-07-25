@@ -1,5 +1,4 @@
 <template>
-      <!-- <el-button @click="emits('update:modelValue', STATUS.SPULIST)">取消</el-button> -->
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
       <el-input placeholder="SPU名称" clearable></el-input>
@@ -7,8 +6,11 @@
 
     <el-form-item label="品牌">
       <el-select>
-        <el-option value="1001" label="北京"></el-option>
-        <el-option value="1002" label="上海"></el-option>
+        <el-option
+        v-for="tm in tmList"
+        :key="tm.id"
+        :value="(tm.id as number)" 
+        :label="tm.tmName"></el-option>
       </el-select>
     </el-form-item>
 
@@ -34,9 +36,14 @@
 
     <el-form-item label="销售属性">
       <div class="mb-10">
-        <el-select placeholder="还有三个未选择" class="mr-10">
-          <el-option value="1001" label="北京"></el-option>
-          <el-option value="1002" label="上海"></el-option>
+        <el-select placeholder="还有3个未选择" class="mr-10">
+          <el-option
+          v-for="saleAttr in baseSaleAttrList"
+          :key="saleAttr.id" 
+          :value="saleAttr.id" 
+          :label="saleAttr.name"
+          
+          ></el-option>
         </el-select>
         <el-button type="primary">添加销售属性</el-button>
       </div>
@@ -71,10 +78,12 @@
 //    3.1 准备保存api,知道我们要收集哪些数据
 //    3.2 收集数据
 // #endregion
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
-  import { STATUS } from '../../index.vue'
+import { STATUS } from '../../index.vue'
+import trademarkApi, { type TMModel } from '@/api/trademark'
+import spuApi, { type SaleAtTrModel } from '@/api/spu'
   const emits =  defineEmits<{
     (e: 'update:modelValue', status: number): void
   }>()
@@ -92,6 +101,26 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
+
+
+// 获取品牌下拉
+const tmList = ref<TMModel[]>([])
+const getTrademarkList = async () => {
+  let result = await trademarkApi.reqTrademarkList()
+  tmList.value = result
+}
+
+// 获取销售属性下拉
+const baseSaleAttrList = ref<SaleAtTrModel[]>([])
+const getSaleAttrList = async () => {
+  baseSaleAttrList.value = await spuApi.reqSaleAttrList()
+}
+
+// 初始化数据展示
+onMounted(()=>{
+  getTrademarkList()
+  getSaleAttrList()
+})
   </script>
   
   <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="spu">
     <el-card class="mb-10">
-      <CategorySelector :disabled="false"></CategorySelector>
+      <CategorySelector :disabled="status != STATUS.SPULIST"></CategorySelector>
     </el-card>
     <el-card>
       <!-- <SpuList v-if="status == 1" @changeStatus="status = $event"></SpuList>
@@ -33,6 +33,9 @@ export enum STATUS {
 // 二、 分页面去写
 //      主列表
 //      新增SPU
+//          添加限制条件:
+//            1. 三级分类的禁用,只要不是主列表展示,都要禁用
+//            2. 主列表中"新增SPU"按钮,只有在三级分类有值的时候,才能点击
 //      新增SKU
 import SpuList from './components/SpuList/index.vue'
 import SpuForm from './components/SpuFrom/index.vue'

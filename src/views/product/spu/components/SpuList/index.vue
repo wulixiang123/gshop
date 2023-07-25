@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" :icon="Plus" class="mb-10" @click="emits('update:modelValue', STATUS.SPUFORM)">新增SPU</el-button>
+    <el-button type="primary" :icon="Plus" :disabled="!categoryStore.category3Id" class="mb-10" @click="emits('update:modelValue', STATUS.SPUFORM)">新增SPU</el-button>
 
     <el-table :data="spuList" border class="mb-10">
       <el-table-column type="index" label="序号" width="80" align="center"></el-table-column>

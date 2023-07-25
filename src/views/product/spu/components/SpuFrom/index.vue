@@ -123,6 +123,13 @@
 //                  这里采用计算属性去做,只要表格中有这条数据,我们就计算出一个新的数组,新的数组中不包含这条数据即可
 //                  拿着这个新的数组在页面中展示
 //            3.2.3.2 添加销售属性值
+//    3.3 保存
+//        组装数据
+//            组装category3Id
+//            组装spuImageList
+//        调用接口,成功之后,切换主列表显示
+//        取消保存,目前使用的是v-if展示当前组件,所以不需要清空 spuForm 这个数据
+//                 如果使用的是v-show就需要了
 // #endregion
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { ElMessage, type InputInstance, type UploadProps, type UploadUserFile } from 'element-plus'
@@ -188,7 +195,7 @@ const emits =  defineEmits<{
     // row.spuSaleAttrValueList // 已存在数组
     // console.log(row.spuSaleAttrValueList.map(item=>item.saleAttrValueName));
     
-    if(row.spuSaleAttrValueList.map(item=>item.saleAttrValueName).includes(row.inputValue as string)){
+    if(row.spuSaleAttrValueList.map(item=>item.saleAttrValueName).includes(row.inputValue)){
       ElMessage.error('输入销售属性值重复,请重试')
       row.inputVisible = false// 展示按钮
       row.inputValue = ''// 清空输入内容
@@ -196,7 +203,7 @@ const emits =  defineEmits<{
     }
     row.spuSaleAttrValueList.push({
       baseSaleAttrId:row.baseSaleAttrId,
-      saleAttrValueName:row.inputValue as string
+      saleAttrValueName:row.inputValue
     })
     row.inputVisible = false// 展示button
     row.inputValue = ''// 清空input框输入的值(一定要清空)

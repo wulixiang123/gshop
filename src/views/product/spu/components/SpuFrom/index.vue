@@ -1,6 +1,7 @@
 <template>
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
+      <!-- clearable是删除的一个小图标 -->
       <el-input placeholder="SPU名称" clearable v-model="spuForm.spuName"></el-input>
     </el-form-item>
 
@@ -37,25 +38,25 @@
 
     <el-form-item label="销售属性">
       <div class="mb-10">
-        <el-select placeholder="还有3个未选择" class="mr-10">
+        <el-select :placeholder="`还有${saleAttrList.length}个未选择`" class="mr-10" v-model="attrIdName">
           <el-option
           v-for="saleAttr in baseSaleAttrList"
           :key="saleAttr.id" 
-          :value="saleAttr.id" 
+          :value="`${saleAttr.id}:${saleAttr.name}`" 
           :label="saleAttr.name"
-          
           ></el-option>
         </el-select>
-        <el-button type="primary">添加销售属性</el-button>
+
+        <el-button type="primary" @click="addSaleAttr">添加销售属性</el-button>
       </div>
 
-      <el-table border>
+      <el-table border :data="spuForm.spuSaleAttrList">
         <el-table-column type="index" label="序号" width="80" align="center"></el-table-column>
         <el-table-column label="属性名" width="200"></el-table-column>
         <el-table-column label="属性值名称列表"></el-table-column>
         <el-table-column label="操作" width="80">
           <template #default="{row,$index}">
-          <el-button type="danger" size="small" :icon="Delete"></el-button>
+          <el-button type="danger" size="small" :icon="Delete" @click="deleteSaleAttr($index)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -90,7 +91,7 @@
 //              收集的数据一定会和我们想要的数据有出入,在保存之前组装数据的时候进行整理
 //        3.2.3 收集销售属性(单独去做)
 // #endregion
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { STATUS } from '../../index.vue'
@@ -101,6 +102,32 @@ import type { SpuModel } from '@/api/spu'
   const emits =  defineEmits<{
     (e: 'update:modelValue', status: number): void
   }>()
+
+
+  // 添加销售属性
+  const attrIdName = ref('')//手机选中的销售属性下拉  收集到的是option的value属性,长的样子`id:name`
+  // 添加销售属性
+  const addSaleAttr = () => {
+    if(!attrIdName.value){
+      return
+    }
+    const [baseSaleAttrId,saleAttrName] = attrIdName.value.split(':')
+    spuForm.value.spuSaleAttrList.push({
+      baseSaleAttrId:+baseSaleAttrId,
+      saleAttrName,
+      spuSaleAttrValueList:[]
+    })
+    attrIdName.value = ''// 重置收集数据的下拉为空
+    debugger
+  }
+
+  // 删除销售属性
+  const deleteSaleAttr = (index:number)=>{
+    spuForm.value.spuSaleAttrList.splice(index,1)
+  }
+
+
+
 
 // 图片上传相关内容 - 不报错,不漂红
 
@@ -161,6 +188,17 @@ const baseSaleAttrList = ref<SaleAttrModel[]>([])
 const getSaleAttrList = async () => {
   baseSaleAttrList.value = await spuApi.reqSaleAttrList()
 }
+
+// 计算属性 - 过滤表格中存在的销售属性
+const saleAttrList = computed(()=>{
+  let newArr = baseSaleAttrList.value.filter(saleAttr=>{
+    let isExist = spuForm.value.spuSaleAttrList.some(item=>{
+      return item.baseSaleAttrId == saleAttr.id
+    })
+    return !isExist
+  })
+  return newArr
+})
 
 // 初始化数据展示
 onMounted(()=>{

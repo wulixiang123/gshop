@@ -52,8 +52,30 @@
 
       <el-table border :data="spuForm.spuSaleAttrList">
         <el-table-column type="index" label="序号" width="80" align="center"></el-table-column>
-        <el-table-column label="属性名" width="200"></el-table-column>
-        <el-table-column label="属性值名称列表"></el-table-column>
+        <el-table-column label="属性名" width="200" prop="saleAttrName"></el-table-column>
+        <el-table-column label="属性值名称列表">
+          <template #default="{row,$index}">
+            <el-tag
+            v-for="(tag,idx) in row.spuSaleAttrValueList"
+            :key="idx"
+            class="mr-10"
+            closable
+            :disable-transitions="false"
+            >{{ tag.saleAttrValueName }}
+            </el-tag>
+
+            <el-input
+            v-if="row.inputVisible"
+            ref="InputRef"
+            v-model.trim="row.inputValue"
+            style="width:100px"
+            size="small"
+            @keyup.enter="handleInputConfirm(row)"
+            @blur="handleInputConfirm(row)"
+            ></el-input>
+            <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput(row)">新增</el-button>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="80">
           <template #default="{row,$index}">
           <el-button type="danger" size="small" :icon="Delete" @click="deleteSaleAttr($index)"></el-button>
@@ -90,18 +112,58 @@
 //              我们这里使用一个单独的变量 spuImageList对图片列表进行收集
 //              收集的数据一定会和我们想要的数据有出入,在保存之前组装数据的时候进行整理
 //        3.2.3 收集销售属性(单独去做)
+//            3.2.3.1 添加销售属性
+//                  1. 此时是无法选中销售属性下拉的,需要v-model绑定一个数据,这里我们使用一个单独的数据对下拉进行收集
+//                  2. 点击"添加销售属性"按钮,此时应该在 spuForm.spuSaleAttrList 中多一条数据
+//                  3. 表格同时页面中展示这条数据
+//                  4. 表格中数据点击删除,要删除一条数据
+//                  注意:
+//                  当点击添加销售属性之后,表格多一条数据,下拉应该少一条数据
+//                  这里采用计算属性去做,只要表格中有这条数据,我们就计算出一个新的数组,新的数组中不包含这条数据即可
+//                  拿着这个新的数组在页面中展示
+//            3.2.3.2 添加销售属性值
 // #endregion
-import { computed, onMounted, ref } from 'vue'
-import type { UploadProps, UploadUserFile } from 'element-plus'
+import { computed, nextTick, onMounted, ref } from 'vue'
+import { ElMessage, type InputInstance, type UploadProps, type UploadUserFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { STATUS } from '../../index.vue'
 import trademarkApi, { type TMModel } from '@/api/trademark'
-import spuApi, { type SaleAttrModel, type SpuImageModel } from '@/api/spu'
+import spuApi, { type SaleAttrModel, type SpuImageModel,type SpuSaleAttrModel,type SpuModel, } from '@/api/spu'
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
-import type { SpuModel } from '@/api/spu'
   const emits =  defineEmits<{
     (e: 'update:modelValue', status: number): void
   }>()
+
+
+  const InputRef = ref<InputInstance>()
+  const showInput = (row:SpuSaleAttrModel)=>{
+    row.inputVisible = true
+    nextTick(()=>{
+      InputRef.value?.focus()
+    })
+  }
+
+  const handleInputConfirm = (row:SpuSaleAttrModel)=>{
+    if(!row.inputVisible){
+      row.inputVisible = false
+      return
+    }
+
+    if(row.spuSaleAttrValueList.map(item=>item.saleAttrValueName).includes(row.inputValue as string)){
+      ElMessage.error('输入销售属性值重复,请重试')
+      row.inputVisible = false
+      row.inputValue = ''
+      return
+    }
+    row.spuSaleAttrValueList.push({
+      baseSaleAttrId:row.baseSaleAttrId,
+      saleAttrValueName:row.inputValue as string
+    })
+    row.inputVisible = false
+    row.inputValue = ''
+  }
+
+
 
 
   // 添加销售属性
@@ -118,7 +180,7 @@ import type { SpuModel } from '@/api/spu'
       spuSaleAttrValueList:[]
     })
     attrIdName.value = ''// 重置收集数据的下拉为空
-    debugger
+    // debugger
   }
 
   // 删除销售属性

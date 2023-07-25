@@ -61,6 +61,7 @@
             class="mr-10"
             closable
             :disable-transitions="false"
+            @close="handleClose(row.spuSaleAttrValueList,idx)"
             >{{ tag.saleAttrValueName }}
             </el-tag>
 
@@ -85,7 +86,7 @@
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary">保存</el-button>
+      <el-button type="primary" @click="onSave">保存</el-button>
       <el-button @click="emits('update:modelValue', STATUS.SPULIST)">取消</el-button>
     </el-form-item>
   </el-form>
@@ -128,40 +129,83 @@ import { ElMessage, type InputInstance, type UploadProps, type UploadUserFile } 
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { STATUS } from '../../index.vue'
 import trademarkApi, { type TMModel } from '@/api/trademark'
-import spuApi, { type SaleAttrModel, type SpuImageModel,type SpuSaleAttrModel,type SpuModel, } from '@/api/spu'
+import spuApi, { type SaleAttrModel, type SpuImageModel, type SpuModel, type SpuSaleAttrModel, type SpuSaleAttrValueModel } from '@/api/spu'
+import useCategoryStore from '@/stores/category'
+const categoryStore = useCategoryStore()
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
-  const emits =  defineEmits<{
-    (e: 'update:modelValue', status: number): void
-  }>()
+const emits =  defineEmits<{
+  (e: 'update:modelValue', status: number): void
+}>()
+
+  const onSave = async() =>{
+    // 组装数据
+    // 三级分类(保存之前组装)
+    spuForm.value.category3Id = categoryStore.category3Id
+    let tempSpuImageList = spuImageList.value.map(item=>{
+      return{
+        imgName:item.name!,
+        imgUrl:item.response.data
+      }
+    })
+    spuForm.value.spuImageList = tempSpuImageList
+
+    // 简单校验一下
+    let { category3Id, spuName, description, tmId, spuSaleAttrList, spuImageList: siList } = spuForm.value
+    if(!(category3Id && spuName && description && tmId && spuSaleAttrList.length && siList.length)){
+      ElMessage.warning('请输入完整内容')
+      return
+    }
+    // 删掉多余的销售属性相关数据
+    spuForm.value.spuSaleAttrList.forEach(item=>{
+      delete item.inputVisible// 控制销售属性值input显示
+      delete item.inputValue  // 收集销售属性值input输入
+  })
+
+  // 发送请求
+  await spuApi.reqSaveSpu(spuForm.value)
+  ElMessage.success('保存成功')
+  emits('update:modelValue', STATUS.SPULIST) // 切换主列表
+  }
 
 
   const InputRef = ref<InputInstance>()
+  // 点击按钮展示input框
   const showInput = (row:SpuSaleAttrModel)=>{
-    row.inputVisible = true
+    row.inputVisible = true// 展示input
     nextTick(()=>{
-      InputRef.value?.focus()
+      InputRef.value?.focus()// 等待DOM跟新完毕之后,拿到input元素,进行自动聚焦
     })
   }
-
+// 添加销售属性值(失焦、回车)
   const handleInputConfirm = (row:SpuSaleAttrModel)=>{
-    if(!row.inputVisible){
-      row.inputVisible = false
+    if(!row.inputValue){  // 做空值校验
+      row.inputVisible = false// 展示button
       return
     }
 
+    // 重复校验
+    // row.inputValue // 当前输入
+    // row.spuSaleAttrValueList // 已存在数组
+    // console.log(row.spuSaleAttrValueList.map(item=>item.saleAttrValueName));
+    
     if(row.spuSaleAttrValueList.map(item=>item.saleAttrValueName).includes(row.inputValue as string)){
       ElMessage.error('输入销售属性值重复,请重试')
-      row.inputVisible = false
-      row.inputValue = ''
+      row.inputVisible = false// 展示按钮
+      row.inputValue = ''// 清空输入内容
       return
     }
     row.spuSaleAttrValueList.push({
       baseSaleAttrId:row.baseSaleAttrId,
       saleAttrValueName:row.inputValue as string
     })
-    row.inputVisible = false
-    row.inputValue = ''
+    row.inputVisible = false// 展示button
+    row.inputValue = ''// 清空input框输入的值(一定要清空)
   }
+
+// 删除销售属性值
+const handleClose = (spuSaleAttrValueList: SpuSaleAttrValueModel[], idx: number) => {
+  spuSaleAttrValueList.splice(idx, 1)
+}
 
 
 
@@ -252,9 +296,15 @@ const getSaleAttrList = async () => {
 }
 
 // 计算属性 - 过滤表格中存在的销售属性
-const saleAttrList = computed(()=>{
-  let newArr = baseSaleAttrList.value.filter(saleAttr=>{
+const saleAttrList = computed(()=>{// 页面中使用的下拉数据
+  let newArr = baseSaleAttrList.value.filter(saleAttr=>{// saleAttr --> { id: 1, name: '颜色' }  { id: 2, name: '版本' }  { id: 3, name: '尺码' }
     let isExist = spuForm.value.spuSaleAttrList.some(item=>{
+      // item的样子
+      // {
+      //   "baseSaleAttrId": 1,
+      //   "saleAttrName": "颜色",
+      //   "spuSaleAttrValueList": []
+      // }
       return item.baseSaleAttrId == saleAttr.id
     })
     return !isExist

@@ -15,13 +15,17 @@ export interface SpuSaleAttrModel {
   baseSaleAttrId: number
   saleAttrName: string
   spuSaleAttrValueList: SpuSaleAttrValueModel[]
+  // -----------------
   inputVisible?: boolean // 前端使用,后端不需要,切换input和button展示
   inputValue?: string // 前端使用,后端不需要,收集输入销售属性值
 }
 // 图片类型
 export interface SpuImageModel {
   imgName: string
-  imgUrl: string
+  imgUrl: string,
+  // ----------------
+  name?: string, // 前端使用,组装数据使用
+  response?: any //  前端使用,组装数据使用
 }
 // SPU类型
 export interface SpuModel {

@@ -26,7 +26,6 @@ const useCategoryStore = defineStore('category', {
       let result = await categoryApi.reqCategory1List()//拿到一级数据
       this.category1List = result
       console.log(result);
-      
     },
     // 获取二级数据(一级分类id改变的时候,调用获取二级数据)
     async getCategory2List() {
@@ -35,9 +34,7 @@ const useCategoryStore = defineStore('category', {
       this.category3List = [] // 重置三级下拉
       this.category2Id = undefined // 重置二级id
       this.category3Id = undefined // 重置三级id
-      if (!this.category1Id) { // 一级id清空(点击清空按钮),此时把二级和三级相关数据清除即可,二级下拉无法获取,因为没有一级id
-        return
-      }
+      if (!this.category1Id)return // 一级id清空(点击清空按钮),此时把二级和三级相关数据清除即可,二级下拉无法获取,因为没有一级id
       // 重新获取二级下拉数据
       let result = await categoryApi.reqCategory2List(this.category1Id as number)
       this.category2List = result
@@ -47,9 +44,7 @@ const useCategoryStore = defineStore('category', {
       // 重置三级id和三级下拉
       this.category3List = []
       this.category3Id = undefined
-      if (!this.category2Id) {
-        return
-      }
+      if (!this.category2Id)return
       // 重新获取三级下拉数据
       let result = await categoryApi.reqCategory3List(this.category2Id as number)
       this.category3List = result

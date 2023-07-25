@@ -1,6 +1,5 @@
 <template>
   <div class="attrs">
-    
     <el-card class="mb-10">
       <!-- :disabled 显示与隐藏 -->
       <CategorySelector :disabled="isEdit"></CategorySelector>
@@ -14,7 +13,6 @@
             <el-input placeholder="请输入属性名" v-model.trim="attrsForm.attrName"></el-input>
           </el-form-item>
         </el-form>
-
         <div class="mb-10">
                                                           <!-- 有值取反是false  disabled是false的时候是不显示的 -->
           <el-button type="primary" @click="addAttrVal" :disabled="!attrsForm.attrName" >添加属性值</el-button>
@@ -43,6 +41,7 @@
               >{{ row.valueName }}</div>
             </template>
           </el-table-column>
+
           <el-table-column label="操作" width="80">
             <template #default="{row,$index}">
               <el-button type="danger" :icon="Delete" size="small"
@@ -61,13 +60,6 @@
 
       <!-- 主列表 -->
       <div v-else>
-              <!-- 加上disabled属性  disabled== true  :disabled="true" 
-              不加disabled属性 disabled== false :disabled="false"
-        -->
-        <!-- 
-          input undefined   false  true ==disabled
-          input 123         true    false == disabled
-         -->
         <el-button type="primary" :icon="Plus" class="mb-10" :disabled="!categoryStore.category3Id" @click="isEdit = true"
         >添加属性</el-button>
         <el-table :data="attrs" border>
@@ -86,7 +78,6 @@
           <el-table-column label="操作" width="140">
             <template #default="{ row,$index }">
               <el-button type="warning" :icon="Edit" size="small" @click="editAttr(row)" title="编辑"></el-button>
-
               <el-popconfirm :title="`确认要删除[${ row.attrName }]吗?`" @confirm="deleteAttr(row)">
                 <template #reference>
                   <el-button type="danger" :icon="Delete" size="small" title="删除"></el-button>
@@ -189,7 +180,6 @@ const hideInput = (row:AttrsValueModel,$index:number) => {
   if(isRepeat){
     ElMessage.error('输入的值不能重复,请重试')
     attrsForm.value.attrValueList.splice($index,1)
-    // return
   }
 }
 

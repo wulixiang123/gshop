@@ -13,15 +13,15 @@ interface ResponseData<T> {
 // 配置新建一个 axios 实例
 const service = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,// 拿的是.env.development 这个文件中设置的环境变量
-	timeout: 50000,
+	timeout: 10000,
 });
 
 // 添加请求拦截器
 service.interceptors.request.use(
 	(config) => {
-    const userInfoStore = useUserInfoStore()
-	const token = userInfoStore.token
-	if(token){
+    const userInfoStore = useUserInfoStore()// 拿到用户信息
+	const token = userInfoStore.token//拿到token
+	if(token){//判断是否有token
 		(config.headers as AxiosRequestHeaders).token = token
 	}
 		return config;

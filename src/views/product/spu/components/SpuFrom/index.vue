@@ -20,9 +20,10 @@
 
     <el-form-item label="SPU图片">
       <el-upload
-      v-model:file-list="fileList"
-      action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+      v-model:file-list="(spuImageList as any)"
+      :action="action"
       list-type="picture-card"
+      :on-success="handleSuccess"
       :on-preview="handlePictureCardPreview"
       :on-remove="handleRemove"
       >
@@ -30,7 +31,7 @@
     </el-upload>
 
     <el-dialog v-model="dialogVisible">
-        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+        <img w-full :src="dialogImageUrl" alt="Preview Image" class="img"/>
     </el-dialog>
     </el-form-item>
 
@@ -80,6 +81,13 @@
 //        创建一个变量用来收集数据
 //        3.2.1 收集普通数据 - 指可以直接使用v-model收集的数据
 //        3.2.2 收集图片列表(单独去做)
+//              拓展:
+//                  let a: number
+//                  let b = '我爱你'
+//                  a = b as any
+//                  当等号两侧的类型不一致的时候,此时可以使用 any 类型进行中转,就可以尽心赋值
+//              我们这里使用一个单独的变量 spuImageList对图片列表进行收集
+//              收集的数据一定会和我们想要的数据有出入,在保存之前组装数据的时候进行整理
 //        3.2.3 收集销售属性(单独去做)
 // #endregion
 import { onMounted, ref } from 'vue'
@@ -87,16 +95,34 @@ import type { UploadProps, UploadUserFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { STATUS } from '../../index.vue'
 import trademarkApi, { type TMModel } from '@/api/trademark'
-import spuApi, { type SaleAttrModel } from '@/api/spu'
+import spuApi, { type SaleAttrModel, type SpuImageModel } from '@/api/spu'
+const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
 import type { SpuModel } from '@/api/spu'
   const emits =  defineEmits<{
     (e: 'update:modelValue', status: number): void
   }>()
 
-  // 图片上传相关内容 - 不报错,不漂红
+// 图片上传相关内容 - 不报错,不漂红
+
+const spuImageList = ref<SpuImageModel[]>([])// 收集图片列表
+
 const fileList = ref<UploadUserFile[]>([]) // 图片列表
 const dialogImageUrl = ref('') // 预览的url
-const dialogVisible = ref(false) // 预览的布尔值,控制dialog显示隐藏\
+const dialogVisible = ref(false) // 预览的布尔值,控制dialog显示隐藏
+
+// 上传成功的回调
+const handleSuccess:UploadProps['onSuccess'] = (
+  response, // 后端返回给我们的数据
+  uploadFile, // 文件的详细信息,名称,大小都有
+  uploadFiles // 文件列表
+)=>{
+  // console.log(response)
+  // console.log(uploadFile)
+  // console.log(uploadFiles)
+  spuImageList.value = uploadFiles as any
+}
+
+
 // 删除的回调
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
   console.log(uploadFile, uploadFiles)
@@ -141,8 +167,22 @@ onMounted(()=>{
   getTrademarkList()
   getSaleAttrList()
 })
+
+
+
+
+
+// -------------------------------
+// let a: string | undefined
+// let b: string
+// b = a!
+// ts中的感叹号可以理解为,非空验证
+
   </script>
   
   <style scoped>
-  
+  .img{
+    width: 100%;
+    height: 100%;
+  }
   </style>

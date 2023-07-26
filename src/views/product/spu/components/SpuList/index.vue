@@ -8,7 +8,7 @@
       <el-table-column label="SPU描述" prop="description"></el-table-column>
       <el-table-column label="操作" width="240">
         <template #default="{ row, $index }">
-          <el-button type="success" :icon="Plus" size="small" title="添加SKU" @click="emits('update:modelValue', STATUS.SKUFORM)"></el-button>
+          <el-button type="success" :icon="Plus" size="small" title="添加SKU" @click="addSku(row)"></el-button>
           <el-button type="warning" :icon="Edit" size="small" title="编辑SPU" @click="editSpu(row)"></el-button>
           <el-button type="info" :icon="InfoFilled" size="small" title="查看SKU列表" @click="showSkuList(row)"></el-button>
 
@@ -68,6 +68,11 @@ const emits = defineEmits<{
   (e: 'update:modelValue', status: number): void,
   (e: 'receiveSpuInfo', row: SpuModel): void
 }>()
+
+const addSku = (row:SpuModel)=>{
+  emits('update:modelValue',STATUS.SKUFORM)// 切换成skuForm组件
+  emits('receiveSpuInfo',cloneDeep(row))// 将当前的row传给父组件,是一条spu
+}
 
 
 // 查看sku列表

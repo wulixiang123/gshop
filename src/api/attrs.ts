@@ -15,7 +15,7 @@ export interface AttrsModel{
     attrValueList:AttrsValueModel[]
 }
 
-type AttrsModelList = AttrsModel[]
+export type AttrsModelList = AttrsModel[]
 
 export default{
     reqAttrsList(category1Id:number,category2Id:number,category3Id:number){

@@ -11,7 +11,7 @@
       -->
       <SpuList v-if="status == STATUS.SPULIST" v-model="status" @receiveSpuInfo="receiveSpuInfo"></SpuList>
       <SpuForm v-if="status == STATUS.SPUFORM" v-model="status" :spuInfo="spuInfo" @receiveSpuInfo="receiveSpuInfo"></SpuForm>
-      <SkuForm v-if="status == STATUS.SKUFORM" v-model="status"></SkuForm>
+      <SkuForm v-if="status == STATUS.SKUFORM" v-model="status" :spuInfo="spuInfo"></SkuForm>
     </el-card>
   </div>
 </template>

@@ -81,5 +81,9 @@ export default {
   // 编辑根据spu的id获取销售属性列表
   reqSaleAttrListBySpuId(spuId: number) {
     return request.get<any, SpuSaleAttrModel[]>(`/admin/product/spuSaleAttrList/${ spuId }`)
+  },
+  // 编辑保存spu
+  reqUpdateSpu(data: SpuModel) {
+    return request.post(`/admin/product/updateSpuInfo`, data)
   }
 }

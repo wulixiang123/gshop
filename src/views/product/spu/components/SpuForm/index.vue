@@ -87,7 +87,8 @@
 
     <el-form-item>
       <el-button type="primary" @click="onSave">保存</el-button>
-      <el-button @click="emits('update:modelValue', STATUS.SPULIST)">取消</el-button>
+      <!-- <el-button @click="emits('update:modelValue', STATUS.SPULIST)">取消</el-button> -->
+      <el-button @click="onCancel">取消</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -157,6 +158,7 @@ const categoryStore = useCategoryStore()
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
 const emits =  defineEmits<{
   (e: 'update:modelValue', status: number): void
+  (e: 'receiveSpuInfo'): void
 }>()
 const props = defineProps<{
   spuInfo:SpuModel
@@ -168,7 +170,9 @@ const props = defineProps<{
     let tempSpuImageList = spuImageList.value.map(item=>{
       return{
         imgName:item.name!,
-        imgUrl:item.response.data
+        imgUrl:item.imgUrl || item.response.data
+        // 这里报错,注意: 新增图片是有response,编辑回显的图片没有response
+        //    编辑的图片有imgUrl,新增的图片没有,在这块组装的
       }
     })
     spuForm.value.spuImageList = tempSpuImageList
@@ -185,11 +189,32 @@ const props = defineProps<{
       delete item.inputValue  // 收集销售属性值input输入
   })
 
-  // 发送请求
-  await spuApi.reqSaveSpu(spuForm.value)
-  ElMessage.success('保存成功')
-  emits('update:modelValue', STATUS.SPULIST) // 切换主列表
+  // // 发送请求
+  // await spuApi.reqSaveSpu(spuForm.value)
+  // ElMessage.success('保存成功')
+  // emits('update:modelValue', STATUS.SPULIST) // 切换主列表
+
+
+
+    // 发送请求
+    if (spuForm.value.id) { // 有id就是编辑
+    await spuApi.reqUpdateSpu(spuForm.value)
+  } else { // 没有id就是新增
+    await spuApi.reqSaveSpu(spuForm.value)
   }
+
+  ElMessage.success('保存成功')
+
+  // emits('update:modelValue', STATUS.SPULIST) // 切换主列表
+  onCancel()
+}
+
+    
+// 取消
+const onCancel = () => {
+emits('update:modelValue', STATUS.SPULIST) // 切换主列表
+emits('receiveSpuInfo') // 清空父级的spuInfo,防止再次点击新增,传过来的spuInfo有id
+}
 
 
   const InputRef = ref<InputInstance>()
@@ -270,10 +295,15 @@ const handleSuccess:UploadProps['onSuccess'] = (
   uploadFile, // 文件的详细信息,名称,大小都有
   uploadFiles // 文件列表
 )=>{
+  if(response.code !== 200){
+    ElMessage.error('图片上传失败,请重试')
+    spuImageList.value.pop()
+    return
+  }
   // console.log(response)
   // console.log(uploadFile)
   // console.log(uploadFiles)
-  spuImageList.value = uploadFiles as any
+  // spuImageList.value = uploadFiles as any  // ---- 可以省略,也可以不省略(省略的原因是组件上是v-model绑定的spuImageList)
 }
 
 
@@ -320,7 +350,8 @@ const getSaleAttrList = async () => {
 // 计算属性 - 过滤表格中存在的销售属性
 const saleAttrList = computed(()=>{// 页面中使用的下拉数据
   let newArr = baseSaleAttrList.value.filter(saleAttr=>{// saleAttr --> { id: 1, name: '颜色' }  { id: 2, name: '版本' }  { id: 3, name: '尺码' }
-    let isExist = spuForm.value.spuSaleAttrList.some(item=>{
+  // 判断当前销售属性在表格中是否存在  
+    let isExist = spuForm.value.spuSaleAttrList?.some(item=>{
       // item的样子
       // {
       //   "baseSaleAttrId": 1,

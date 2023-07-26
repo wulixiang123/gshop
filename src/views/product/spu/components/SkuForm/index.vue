@@ -75,7 +75,7 @@
 
     <el-form-item label="图片列表">
 
-      <el-table :data="imageList" border>
+      <el-table :data="imageList" border @select="selectChange">
         <el-table-column type="selection" width="80" align="center"></el-table-column>
         <el-table-column label="图片">
           <template #default="{ row, $index }">
@@ -85,7 +85,8 @@
         <el-table-column label="名称" prop="imgName"></el-table-column>
         <el-table-column label="操作" width="100">
           <template #default="{ row, $index }">
-            <el-button type="primary" size="small">设为默认</el-button>
+            <el-tag v-if="row.isDefault == '1'" type="success" size="small">默认</el-tag>
+            <el-button v-else type="primary" size="small" @click="setDefaultImage(row)">设为默认</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -136,6 +137,19 @@ const emits =  defineEmits<{
 const props = defineProps<{
   spuInfo: SpuModel
 }>()
+
+
+// 图片选中的回调(图片列表的收集)
+const selectChange = (imgList: SpuImageModel[]) => {
+  skuForm.value.skuImageList = imgList
+}
+
+// 设置默认图片
+const setDefaultImage = (row: SpuImageModel) => {
+  imageList.value.forEach(item => item.isDefault = '0')
+  row.isDefault = '1'
+}
+
 
 
 const initSkuForm = () => ({

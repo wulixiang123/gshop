@@ -84,6 +84,10 @@ export default {
   },
   // 编辑保存spu
   reqUpdateSpu(data: SpuModel) {
-    return request.post(`/admin/product/updateSpuInfo`, data)
+    return request.post<any,null>(`/admin/product/updateSpuInfo`, data)
+  },
+  // 删除spu
+  reqDeleteSpu(spuId:number){
+    return request.delete<any,null>(`/admin/product/deleteSpu/${spuId}`)
   }
 }

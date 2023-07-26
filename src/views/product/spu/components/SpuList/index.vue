@@ -9,9 +9,15 @@
       <el-table-column label="操作" width="240">
         <template #default="{ row, $index }">
           <el-button type="success" :icon="Plus" size="small" title="添加SKU" @click="emits('update:modelValue', STATUS.SKUFORM)"></el-button>
-          <el-button type="warning" :icon="Edit" size="small" title="编辑SPU"></el-button>
-          <el-button type="info" :icon="InfoFilled" size="small" title="查看SKU列表"></el-button>
-          <el-button type="danger" :icon="Delete" size="small" title="删除SPU"></el-button>
+          <el-button type="warning" :icon="Edit" size="small" title="编辑SPU" @click="editSpu(row)"></el-button>
+          <el-button type="info" :icon="InfoFilled" size="small" title="查看SKU列表" @click="showSkuList(row)"></el-button>
+
+          <el-popconfirm :title="`确认要删除[${ row.spuName }]吗?`" @confirm="deleteSpu(row)">
+            <template #reference>
+              <el-button type="danger" :icon="Delete" size="small" title="删除SPU"></el-button>
+            </template>
+          </el-popconfirm>
+
         </template>
       </el-table-column>
     </el-table>
@@ -25,6 +31,26 @@
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
+
+    <el-dialog
+      v-model="showSkuDialog"
+      :title="`[${ currentSpuName }]的sku列表`"
+      width="80%"
+      @close="clearSkuList"
+    >
+      
+      <el-table :data="skuList" v-loading="loading">
+        <el-table-column label="名称" prop="skuName"></el-table-column>
+        <el-table-column label="价格" prop="price"></el-table-column>
+        <el-table-column label="重量" prop="weight"></el-table-column>
+        <el-table-column label="默认图片">
+          <template #default="{ row, $index }">
+            <img :src="row.skuDefaultImg" style="width: 60px;height: 60px;">
+          </template>
+        </el-table-column>
+      </el-table>
+      
+    </el-dialog>
   </div>
 </template>
 
@@ -34,10 +60,55 @@ import { STATUS } from '../../index.vue'
 import { ref, watch } from 'vue'
 import spuApi, { type SpuModel } from '@/api/spu'
 import useCategoryStore from '@/stores/category'
+import { cloneDeep } from 'lodash'
+import { ElMessage } from 'element-plus'
+import skuApi, { type SkuModel } from '@/api/sku'
 const categoryStore = useCategoryStore()
 const emits = defineEmits<{
-  (e: 'update:modelValue', status: number): void
+  (e: 'update:modelValue', status: number): void,
+  (e: 'receiveSpuInfo', row: SpuModel): void
 }>()
+
+
+// 查看sku列表
+const showSkuDialog = ref(false) // 默认不弹框
+const currentSpuName = ref('') // dialog弹框的标题
+const skuList = ref<SkuModel[]>([]) // 存表格数据
+const loading = ref(false) // 默认不加载
+const showSkuList = async (row: SpuModel) => {
+  // 弹框展示
+  showSkuDialog.value = true
+  currentSpuName.value = row.spuName
+  loading.value = true
+  // 调用接口拿数据
+  try {
+    let result = await skuApi.reqSkuListBySpuId(row.id!)
+    skuList.value = result
+    console.log(skuList.value)
+  } finally {
+    loading.value = false
+  }
+}
+// 弹窗消失,清空列表
+const clearSkuList = () => {
+  skuList.value = []
+}
+
+
+// 编辑
+const editSpu = (row: SpuModel) => {
+  emits('update:modelValue', STATUS.SPUFORM) // 切换SpuForm组件展示
+
+  emits('receiveSpuInfo', cloneDeep(row)) // 将当前编辑的spu传给父组件,父组件接收到之后,再次传给SpuForm组件,进行数据回显
+}
+
+
+// 删除
+const deleteSpu = async (row: SpuModel) => {
+  await spuApi.reqDeleteSpu(row.id!)
+  ElMessage.success('删除成功')
+  getPage() // 重新获取数据
+}
 
 
 // 翻页交互

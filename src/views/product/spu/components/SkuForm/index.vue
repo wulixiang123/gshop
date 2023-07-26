@@ -1,5 +1,6 @@
 <template>
   <el-form label-width="100px">
+
     <el-form-item label="SPU名称">
       <div>{{ spuInfo.spuName }}</div>
     </el-form-item>
@@ -20,11 +21,8 @@
       <el-input type="textarea" placeholder="规格描述" v-model="skuForm.skuDesc"></el-input>
     </el-form-item>
 
-
     <el-form-item label="平台属性">
-
       <el-form inline>
-
         <el-form-item
           v-for="attr in attrList"
           :key="attr.id"
@@ -39,17 +37,11 @@
             ></el-option>
           </el-select>
         </el-form-item>
-
-
       </el-form>
-
     </el-form-item>
 
-
     <el-form-item label="销售属性">
-
       <el-form inline>
-
         <el-form-item
           v-for="saleAttr in saleAttrList"
           :key="saleAttr.id"
@@ -64,13 +56,10 @@
             ></el-option>
           </el-select>
         </el-form-item>
-
       </el-form>
-
     </el-form-item>
 
     <el-form-item label="图片列表">
-
       <el-table :data="imageList" border @select="selectChange">
         <el-table-column type="selection" width="80" align="center"></el-table-column>
         <el-table-column label="图片">
@@ -86,16 +75,12 @@
           </template>
         </el-table-column>
       </el-table>
-
     </el-form-item>
-
 
     <el-form-item>
       <el-button type="primary" @click="onSave">保存</el-button>
       <el-button @click="onCancel">取消</el-button>
     </el-form-item>
-
-
   </el-form>
 </template>
 
@@ -150,9 +135,7 @@ const onSave = async () => {
   // 平台属性
   // attrList.value.filter(item => item.attrIdValueId)  --> // 把选中的过滤出来 [{}, {}]
   skuForm.value.skuAttrValueList = attrList.value.filter(item => item.attrIdValueId).map(item => { // 每个item是一个平台属性
-
     const [attrId, valueId] = item.attrIdValueId?.split(':')! // '106:176' 进行分割
-
     return {
       attrId,
       valueId
@@ -160,35 +143,24 @@ const onSave = async () => {
   })
   // 销售属性
   skuForm.value.skuSaleAttrValueList = saleAttrList.value.filter(item => item.attrIdValueId).map(item => {
-
     const [saleAttrId, saleAttrValueId] = item.attrIdValueId?.split(":")!
-
     return {
       saleAttrId,
       saleAttrValueId
     }
-
   })
 
   // 发送请求
-
   await skuApi.reqSave(skuForm.value)
-
   ElMessage.success('保存成功')
-
   onCancel()
-
 }
 
 // 取消
 const onCancel = () => {
   emits('update:modelValue', STATUS.SPULIST) // 切换主列表
-
   emits('receiveSpuInfo') // 清空父组件的 spuInfo
 }
-
-
-
 
 // 图片选中的回调(图片列表的收集)
 const selectChange = (imgList: SpuImageModel[]) => {
@@ -227,6 +199,7 @@ const getAttrList = async () => {
   attrList.value = result
   console.log('平台属性', attrList.value)
 }
+
 // 获取销售属性
 const saleAttrList = ref<SpuSaleAttrModel[]>([])
 const getSaleAttrList = async () => {
@@ -234,6 +207,7 @@ const getSaleAttrList = async () => {
   saleAttrList.value = result
   console.log('销售属性', saleAttrList.value)
 }
+
 // 获取图片列表
 const imageList = ref<SpuImageModel[]>([])
 const getImageList = async () => {

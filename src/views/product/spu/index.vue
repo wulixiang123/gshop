@@ -10,7 +10,7 @@
         <SkuForm v-if="status == STATUS.SKUFORM" @update:modelValue="status = $event"></SkuForm>
       -->
       <SpuList v-if="status == STATUS.SPULIST" v-model="status" @receiveSpuInfo="receiveSpuInfo"></SpuList>
-      <SpuForm v-if="status == STATUS.SPUFORM" v-model="status" :spuInfo="spuInfo"></SpuForm>
+      <SpuForm v-if="status == STATUS.SPUFORM" v-model="status" :spuInfo="spuInfo" @receiveSpuInfo="receiveSpuInfo"></SpuForm>
       <SkuForm v-if="status == STATUS.SKUFORM" v-model="status"></SkuForm>
     </el-card>
   </div>
@@ -46,7 +46,6 @@ import type { SpuModel } from '@/api/spu';
 // 1是主列表  2是新增Spu  3是新增Sku
 const status = ref(STATUS.SPULIST) // 默认展示主列表
 
-
 const initSpuInfo = () => ({
   spuName: '',
   description: '',
@@ -58,8 +57,12 @@ const initSpuInfo = () => ({
 // 用来在编辑的时候,把某一条spu传给父组件,父组件再传给spuForm组件
 const spuInfo = ref<SpuModel>( initSpuInfo() )
 
-const receiveSpuInfo = (row: SpuModel) => {
-  spuInfo.value = row
+const receiveSpuInfo = (row: SpuModel | undefined) => {
+  if (row) {
+    spuInfo.value = row // 点击编辑回显数据
+  } else {
+    spuInfo.value = initSpuInfo() // 编辑界面保存之后,需要清除父组件的spuInfo
+  }
 }
 
 

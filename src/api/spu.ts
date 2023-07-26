@@ -26,6 +26,7 @@ export interface SpuSaleAttrModel {
   // -----------------
   inputVisible?: boolean // 前端使用,后端不需要,切换input和button展示
   inputValue?: string // 前端使用,后端不需要,收集输入销售属性值
+  attrIdValueId?:string // 前端使用,收集 `属性id:属性值id`
 }
 // 图片类型
 export interface SpuImageModel {

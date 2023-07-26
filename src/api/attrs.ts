@@ -13,6 +13,7 @@ export interface AttrsModel{
     categoryId:number | undefined
     categoryLevel:number | undefined
     attrValueList:AttrsValueModel[]
+    attrIdValueId?:string//前端使用,用来收集数据
 }
 
 export type AttrsModelList = AttrsModel[]

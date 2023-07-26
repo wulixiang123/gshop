@@ -34,11 +34,11 @@
           :key="attr.id"
           :label="attr.attrName"
         >
-          <el-select>
+          <el-select v-model="attr.attrIdValueId">
             <el-option
               v-for="attrVal in attr.attrValueList"
               :key="attrVal.id"
-              :value="attrVal.id!"
+              :value="`${attr.id}:${attrVal.id}`"
               :label="attrVal.valueName"
             ></el-option>
           </el-select>
@@ -59,11 +59,11 @@
           :key="saleAttr.id"
           :label="saleAttr.saleAttrName"
         >
-          <el-select>
+          <el-select v-model="saleAttr.attrIdValueId">
             <el-option
               v-for="saleAttrVal in saleAttr.spuSaleAttrValueList"
               :key="saleAttrVal.id"
-              :value="saleAttrVal.id!"
+              :value="`${saleAttr.id}:${saleAttrVal.id}`"
               :label="saleAttrVal.saleAttrValueName"
             ></el-option>
           </el-select>

@@ -38,6 +38,7 @@ export interface SpuImageModel {
   name?: string, // 前端使用,组装数据使用(upload展示必须有)
   response?: any //  前端使用,组装数据使用
   url?: string // 前端使用,组装数据使用(upload展示必须有)
+  isDefault?: string // 0是不默认  1是默认
 }
 // SPU类型
 export interface SpuModel {

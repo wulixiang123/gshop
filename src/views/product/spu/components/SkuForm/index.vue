@@ -1,8 +1,4 @@
 <template>
-  <!-- <div>
-    <div>SkuForm - 新增SKU</div>
-    <el-button @click="emits('update:modelValue', STATUS.SPULIST)">取消</el-button>
-  </div> -->
   <el-form label-width="100px">
     <el-form-item label="SPU名称">
       <div>{{ spuInfo.spuName }}</div>
@@ -95,8 +91,8 @@
 
 
     <el-form-item>
-      <el-button type="primary">保存</el-button>
-      <el-button>取消</el-button>
+      <el-button type="primary" @click="onSave">保存</el-button>
+      <el-button @click="onCancel">取消</el-button>
     </el-form-item>
 
 
@@ -128,15 +124,70 @@ import { onMounted, ref } from "vue";
 import { STATUS } from "../../index.vue";
 import spuApi, { type SpuModel, type SpuSaleAttrModel, type SpuImageModel } from "@/api/spu";
 import attrsApi, { type AttrsModelList } from "@/api/attrs";
+import skuApi from '@/api/sku'
 import useCategoryStore from "@/stores/category";
 import type { SkuModel } from "@/api/sku";
+import { ElMessage } from "element-plus";
 const categoryStore = useCategoryStore()
 const emits =  defineEmits<{
   (e: 'update:modelValue', status: number): void
+  (e:'receiveSpuInfo') :void
 }>()
 const props = defineProps<{
   spuInfo: SpuModel
 }>()
+
+
+
+// 保存
+const onSave = async () => {
+  // 组装数据
+  skuForm.value.spuId = props.spuInfo.id
+  skuForm.value.tmId = props.spuInfo.tmId
+  skuForm.value.category3Id = categoryStore.category3Id
+  // 默认图片之前仅仅是标注出来了,没有收集呢,现在收集
+  skuForm.value.skuDefaultImg = imageList.value.find(item => item.isDefault == '1')?.imgUrl!
+  // 平台属性
+  // attrList.value.filter(item => item.attrIdValueId)  --> // 把选中的过滤出来 [{}, {}]
+  skuForm.value.skuAttrValueList = attrList.value.filter(item => item.attrIdValueId).map(item => { // 每个item是一个平台属性
+
+    const [attrId, valueId] = item.attrIdValueId?.split(':')! // '106:176' 进行分割
+
+    return {
+      attrId,
+      valueId
+    }
+  })
+  // 销售属性
+  skuForm.value.skuSaleAttrValueList = saleAttrList.value.filter(item => item.attrIdValueId).map(item => {
+
+    const [saleAttrId, saleAttrValueId] = item.attrIdValueId?.split(":")!
+
+    return {
+      saleAttrId,
+      saleAttrValueId
+    }
+
+  })
+
+  // 发送请求
+
+  await skuApi.reqSave(skuForm.value)
+
+  ElMessage.success('保存成功')
+
+  onCancel()
+
+}
+
+// 取消
+const onCancel = () => {
+  emits('update:modelValue', STATUS.SPULIST) // 切换主列表
+
+  emits('receiveSpuInfo') // 清空父组件的 spuInfo
+}
+
+
 
 
 // 图片选中的回调(图片列表的收集)

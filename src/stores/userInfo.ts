@@ -101,6 +101,7 @@ export const useUserInfoStore = defineStore('userInfo', {
     async reset(){
       try {
         await userinfoApi.reqLogout()//调用退出登录接口
+        router.push('/')
       } catch (error) {
         console.log(error);
       }finally{

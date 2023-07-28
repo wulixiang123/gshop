@@ -125,6 +125,8 @@ const handleLogin = async () => {
     router.push({ path: redirect.value || '/' })
   } finally {
     loading.value = false
+    // router.go(1)
+    location.reload()//强制刷新页面
   }
 }
 </script>

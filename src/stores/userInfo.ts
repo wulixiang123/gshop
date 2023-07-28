@@ -3,8 +3,27 @@ import { defineStore } from 'pinia';
 import { getToken, removeToken, setToken } from '../utils/token-utils';
 // import type { UserInfoState } from './interface';
 import {ElMessage} from 'element-plus'
-import {staticRoutes} from '@/router/routes'
+import {allAsyncRoutes, anyRoute, staticRoutes} from '@/router/routes'
 import userinfoApi,{type UserInfoModel} from '@/api/userinfo';
+
+
+
+const filterRoutes = (allAsyncRoutes:RouteRecordRaw[],routes:string[])=>{
+  let newArr = allAsyncRoutes.filter(route=>{
+    let isExist = routes.includes((route.name as string))
+    if(route.children && route.children.length){
+      route.children = filterRoutes(route.children,routes)
+    }
+    return isExist
+  })
+  return newArr
+}
+
+
+
+
+
+
 
 export interface UserInfoState {
   token: string;
@@ -53,7 +72,14 @@ export const useUserInfoStore = defineStore('userInfo', {
         let result = await userinfoApi.reqGetInfo()//获取到个人信息
         // console.log(result);
         this.userInfo = result// 存储个人信息(包括权限信息)
-        this.menuRoutes = staticRoutes// 根据权限信息展示侧边栏,目前写死
+        // this.menuRoutes = staticRoutes// 根据权限信息展示侧边栏,目前写死
+        debugger
+
+        let asyncRoutes = filterRoutes(allAsyncRoutes,result.routes)
+        console.log('筛选后',asyncRoutes);
+        let allRoutes = staticRoutes.concat(asyncRoutes,anyRoute)
+        this.menuRoutes = allRoutes
+        
       } catch (error) {
         console.error(error)
         return Promise.reject(error)

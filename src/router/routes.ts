@@ -9,7 +9,7 @@ import type { RouteRecordRaw } from 'vue-router';
  */
 
 /**
- * 静态路由（默认路由）
+ * 静态路由（默认路由）- 不需要和权限信息进行筛选的路由
  */
  export const staticRoutes: Array<RouteRecordRaw> = [
   {
@@ -52,63 +52,69 @@ import type { RouteRecordRaw } from 'vue-router';
       }
     }]
   },
-
-  {
-    path: '/product',
-    component: () => import('@/layout/index.vue'),
-      meta: { 
-        title: '商品管理', 
-        icon: 'ele-GoodsFilled', 
-      },
-      children:[
-        {
-          path:'trademark',
-          name:'Trademark',
-          component:()=>import('@/views/product/trademark/index.vue'),
-          meta:{
-            title:'品牌管理'
-          }
-        },
-        {
-          path:'attrs',
-          name:'Attrs',
-          component:()=>import('@/views/product/attrs/index.vue'),
-          meta:{
-            title:'平台管理属性'
-          }
-        },
-        {
-          path:'spu',
-          name:'Spu',
-          component:()=>import('@/views/product/spu/index.vue'),
-          meta:{
-            title:'SPU管理'
-          }
-        },
-        {
-          path:'sku',
-          name:'Sku',
-          component:()=>import('@/views/product/sku/index.vue'),
-          meta:{
-            title:'SKU管理'
-          }
-        }
-      ]
-  },
-
-  /* 匹配任意的路由 必须最后注册 */
-  { 
-    path: '/:pathMatch(.*)', 
-    name: 'Any',
-    redirect: '/404', 
-    meta: {
-      hidden: true 
-    }
-  }
 ];
 
 
-/**
- * 定义动态路由
- */
-export const allAsyncRoutes: Array<RouteRecordRaw> = [];
+
+  export const allAsyncRoutes:Array<RouteRecordRaw> = [
+    {
+      path: '/product',
+      name: 'Product',  // 这里得name属性用来和获取个人信息中权限信息进行对比,如果权限中包含这个那name数据,那么当前路由应该展示
+      component: () => import('@/layout/index.vue'),
+        meta: { 
+          title: '商品管理', 
+          icon: 'ele-GoodsFilled', 
+        },
+        children:[
+          {
+            path:'trademark',
+            name:'Trademark',
+            component:()=>import('@/views/product/trademark/index.vue'),
+            meta:{
+              title:'品牌管理'
+            }
+          },
+          {
+            path:'attrs',
+            name:'Attr',
+            component:()=>import('@/views/product/attrs/index.vue'),
+            meta:{
+              title:'平台管理属性'
+            }
+          },
+          {
+            path:'spu',
+            name:'Spu',
+            component:()=>import('@/views/product/spu/index.vue'),
+            meta:{
+              title:'SPU管理'
+            }
+          },
+          {
+            path:'sku',
+            name:'Sku',
+            component:()=>import('@/views/product/sku/index.vue'),
+            meta:{
+              title:'SKU管理'
+            }
+          }
+        ]
+      }
+    ]
+
+
+  
+    
+    
+    /**
+     * 定义动态路由
+    */
+   export const anyRoute:RouteRecordRaw = {
+     /* 匹配任意的路由 必须最后注册 */
+       path: '/:pathMatch(.*)', 
+       name: 'Any',
+       redirect: '/404', 
+       meta: {
+         hidden: true 
+       }
+     }

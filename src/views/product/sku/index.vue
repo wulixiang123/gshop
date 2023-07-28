@@ -13,11 +13,11 @@
       <el-table-column label="价格(元)" prop="price"></el-table-column>
       <el-table-column label="操作" align="center" width="250">
         <template #default="{row,$index}">
-          <el-button v-if="row.isSale" type="success" size="small" icon="ele-Top" title="下架" @click="cancelSale(row)"></el-button>
-          <el-button v-else type="success" size="small" icon="ele-Top" title="上架" @click="onSale(row)"></el-button>
-          <el-button type="primary" size="small" icon="ele-Edit" title="修改"></el-button>
+          <el-button v-if="row.isSale" type="success" size="small" icon="ele-Top" @click="cancelSale(row)" title="下架"></el-button>
+          <el-button v-else type="info" size="small" icon="ele-Bottom" @click="onSale(row)" title="上架"></el-button>
+          <el-button type="primary" size="small" icon="ele-Edit" title="修改" @click="updateSku(row)"></el-button>
           <el-button type="info" size="small" icon="ele-InfoFilled" title="查看详情"></el-button>
-          <el-button type="danger" size="small" icon="ele-Delete" title="删除sku"></el-button>
+          <el-button type="danger" size="small" icon="ele-Delete" title="删除sku" @click="delete"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import skuApi, { type skuInfoDate } from '@/api/sku'
+import { ElMessage } from 'element-plus';
 
 const page = ref(1)
 const limit = ref(10)
@@ -54,14 +55,33 @@ onMounted(()=>{
 })
 
 
+
+// 编辑
+const updateSku = (row: skuInfoDate) => {
+  ElMessage.success('正在开发中！！！！')
+}
+
+
+
 // 上架
 const cancelSale = async(row:skuInfoDate) => {
-  await skuApi.cancelSale(row.id as number)
-  getSkuList()
+  try {
+    await skuApi.cancelSale(row.id as number)
+    getSkuList()
+    ElMessage.success('下架成功')
+  } catch (error) {
+    ElMessage.error('下架失败')
+  }
 }
 // 下架
 const onSale = async(row:skuInfoDate)=>{
-  await skuApi.onSale(row.id as number)
+  try {
+    await skuApi.onSale(row.id as number)
+    getSkuList()
+    ElMessage.success('上架成功')
+  } catch (error) {
+    ElMessage.error('上架失败')
+  }
 }
 
 
@@ -76,5 +96,10 @@ const getSkuList = async(pager = 1) => {
 </script>
 
 <style scoped>
-
+body {
+  margin: 0;
+}
+.example-showcase .el-loading-mask {
+  z-index: 9;
+}
 </style>

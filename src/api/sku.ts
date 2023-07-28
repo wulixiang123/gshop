@@ -107,5 +107,13 @@ export default {
     // 获取sku分页列表数据
     reqSkuList(page:number,limit:number){
         return request.get<any,SkuPageListData>(`admin/product/list/${page}/${limit}`)
-    }
+    },
+    // 上架接口
+    cancelSale(skuId:number){
+        return request.get<any,null>(`/admin/product/cancelSale/${skuId}`)
+    },
+    // 下架
+    onSale(skuId: number) {
+        return request.get<any, null>(`/admin/product/onSale/${skuId}`)
+      },
 }

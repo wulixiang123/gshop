@@ -13,10 +13,11 @@
       <el-table-column label="价格(元)" prop="price"></el-table-column>
       <el-table-column label="操作" align="center" width="250">
         <template #default="{row,$index}">
-          <el-button type="success" size="small" icon="ele-Top"></el-button>
-          <el-button type="primary" size="small" icon="ele-Edit"></el-button>
-          <el-button type="info" size="small" icon="ele-InfoFilled"></el-button>
-          <el-button type="danger" size="small" icon="ele-Delete"></el-button>
+          <el-button v-if="row.isSale" type="success" size="small" icon="ele-Top" title="下架" @click="cancelSale(row)"></el-button>
+          <el-button v-else type="success" size="small" icon="ele-Top" title="上架" @click="onSale(row)"></el-button>
+          <el-button type="primary" size="small" icon="ele-Edit" title="修改"></el-button>
+          <el-button type="info" size="small" icon="ele-InfoFilled" title="查看详情"></el-button>
+          <el-button type="danger" size="small" icon="ele-Delete" title="删除sku"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,6 +52,19 @@ const skuInfo = ref<skuInfoDate>({
 onMounted(()=>{
   getSkuList()
 })
+
+
+// 上架
+const cancelSale = async(row:skuInfoDate) => {
+  await skuApi.cancelSale(row.id as number)
+  getSkuList()
+}
+// 下架
+const onSale = async(row:skuInfoDate)=>{
+  await skuApi.onSale(row.id as number)
+}
+
+
 
 const getSkuList = async(pager = 1) => {
   page.value = pager

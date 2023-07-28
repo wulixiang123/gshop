@@ -5,9 +5,10 @@ import { getToken, removeToken, setToken } from '../utils/token-utils';
 import {ElMessage} from 'element-plus'
 import {allAsyncRoutes, anyRoute, staticRoutes} from '@/router/routes'
 import userinfoApi,{type UserInfoModel} from '@/api/userinfo';
+import router from "@/router";
 
 
-
+// 筛选路由
 const filterRoutes = (allAsyncRoutes:RouteRecordRaw[],routes:string[])=>{
   let newArr = allAsyncRoutes.filter(route=>{
     let isExist = routes.includes((route.name as string))
@@ -17,6 +18,15 @@ const filterRoutes = (allAsyncRoutes:RouteRecordRaw[],routes:string[])=>{
     return isExist
   })
   return newArr
+}
+
+
+
+// 动态注册路由
+const addRoutes = (allRoutes: RouteRecordRaw[]) => {
+  allRoutes.forEach(route => {
+    router.addRoute(route) // 动态注册路由 ***
+  })
 }
 
 
@@ -73,12 +83,13 @@ export const useUserInfoStore = defineStore('userInfo', {
         // console.log(result);
         this.userInfo = result// 存储个人信息(包括权限信息)
         // this.menuRoutes = staticRoutes// 根据权限信息展示侧边栏,目前写死
-        debugger
+        // debugger
 
         let asyncRoutes = filterRoutes(allAsyncRoutes,result.routes)
-        console.log('筛选后',asyncRoutes);
         let allRoutes = staticRoutes.concat(asyncRoutes,anyRoute)
         this.menuRoutes = allRoutes
+
+        addRoutes(allRoutes)
         
       } catch (error) {
         console.error(error)

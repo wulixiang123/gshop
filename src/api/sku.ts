@@ -115,5 +115,13 @@ export default {
     // 下架
     onSale(skuId: number) {
         return request.get<any, null>(`/admin/product/onSale/${skuId}`)
-      },
+    },
+    // 删除
+    deleteSku(skuId:number){
+        return request.delete<any,null>(`/admin/product/deleteSku/${skuId}`)
+    },
+    // 查看详情
+    getSkuInfo(skuId:number){
+        return request.get<any,skuInfoDate>(`/admin/product/getSkuById/${skuId}`)
+    }
 }

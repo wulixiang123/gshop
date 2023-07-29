@@ -11,6 +11,7 @@
       </el-table-column>
       <el-table-column label="重量(KG)" prop="weight"></el-table-column>
       <el-table-column label="价格(元)" prop="price"></el-table-column>
+      <el-table-column label="上架时间" prop="createTime"></el-table-column>
       <el-table-column label="操作" align="center" width="250">
         <template #default="{row,$index}">
           <el-button v-if="row.isSale" type="success" size="small" icon="ele-Top" @click="cancelSale(row)" title="下架"></el-button>
@@ -213,6 +214,18 @@ const getSkuList = async(pager = 1) => {
 </script>
 
 <style scoped>
+
+.el-col{
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+.a{
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+}
+
 body {
   margin: 0;
 }

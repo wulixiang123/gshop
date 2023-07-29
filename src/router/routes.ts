@@ -17,7 +17,7 @@ import type { RouteRecordRaw } from 'vue-router';
     name:'Test',
     component:()=>import('@/views/test/index.vue'),
     meta:{
-      hidden:true
+      hidden:true//隐藏此路由
     }
   },
 	{
@@ -56,7 +56,62 @@ import type { RouteRecordRaw } from 'vue-router';
 
 
 
-  export const allAsyncRoutes:Array<RouteRecordRaw> = [
+/**
+ * 定义动态路由 - 需要和权限信息进行筛选的路由
+ */
+export const allAsyncRoutes: Array<RouteRecordRaw> = [
+
+  {
+    path: "/acl",
+    name: "Acl",
+    component: () => import("@/layout/index.vue"),
+    redirect: "/acl/user/list",
+    meta: {
+      title: "权限管理",
+      icon: "ele-Setting",
+    },
+    children: [
+      {
+        name: "User",
+        path: "/acl/user/list",
+        component: () => import("@/views/acl/user/index.vue"),
+        meta: {
+          title: "用户管理",
+        },
+      },
+      {
+        name: "Role",
+        path: "/acl/role/list",
+        component: () => import("@/views/acl/role/index.vue"),
+        meta: {
+          title: "角色管理",
+        },
+      },
+      {
+        name: "RoleAuth",
+        path: "/acl/role/auth",
+        component: () => import("@/views/acl/role/roleAuth.vue"),
+        meta: {
+          title: "角色管理",
+          hidden: true,
+          activeMenu: "/acl/role/list",
+        },
+      },
+      {
+        name: "Permission",
+        path: "/acl/permission/list",
+        component: () => import("@/views/acl/permission/index.vue"),
+        meta: {
+          title: "菜单管理",
+        },
+      },
+    ],
+  },
+
+
+
+
+
     {
       path: '/product',
       name: 'Product',  // 这里得name属性用来和获取个人信息中权限信息进行对比,如果权限中包含这个那name数据,那么当前路由应该展示

@@ -1,7 +1,8 @@
 <template>
   <el-card class="box-card">
     <template #header>                          <!-- 此回调打开弹框 -->
-        <el-button type="primary" :icon="Plus" @click="addTrademark">添加</el-button>
+        <!-- <el-button type="primary" :icon="Plus" @click="addTrademark">添加</el-button> -->
+        <el-button v-if="userInfoStore.userInfo.buttons.includes('btn.Trademark.add')" type="primary" :icon="Plus" @click="addTrademark">添加</el-button>
     </template>
     <!-- 
       当 el-table 元素中注入 data 对象数组后，
@@ -141,6 +142,10 @@ import { Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules, type UploadProps } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { cloneDeep } from 'lodash'
+
+import { useUserInfoStore } from '@/stores/userInfo'
+const userInfoStore = useUserInfoStore()
+
 const action = `${ import.meta.env.VITE_API_URL }/admin/product/upload`
 
 // 自定义某个字段的校验规则

@@ -13,6 +13,7 @@
     "axios": "^0.27.2",
     "element-plus": "^2.3.8",
     "js-cookie": "^3.0.1",
+    "mockjs": "^1.1.0",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "path-browserify": "^1.0.1",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.0",
     "@types/js-cookie": "^3.0.2",
+    "@types/mockjs": "^1.0.7",
     "@types/node": "^16.11.36",
     "@types/nprogress": "^0.2.0",
     "@types/path-browserify": "^1.0.0",

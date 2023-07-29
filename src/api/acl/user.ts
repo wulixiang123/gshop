@@ -77,5 +77,6 @@ export const removeUserApi = (id: string) => {
  * @returns 
  */
 export const removeUsersApi = (ids: string[]) => {
-  return request.post<any, null>(Api.RemoveUsers, ids);
+  // return request.post<any, null>(Api.RemoveUsers, ids);
+  return request.post<any,null>(Api.RemoveUsers,ids)
 };

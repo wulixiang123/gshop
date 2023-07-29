@@ -15,6 +15,16 @@ import CategorySelector from '@/components/CategorySelector/index.vue'
 app.component('CategorySelector', CategorySelector)
 
 
+import { useUserInfoStore } from '@/stores/userInfo'
+const userInfoStore = useUserInfoStore()
+app.directive('permissionbtn', (el, binding) => {
+  if ( !userInfoStore.userInfo.buttons.includes(binding.value) ) {
+    el.remove()
+  }
+})
+
+
+
 ElSvg(app)
 
 app.use(pinia)

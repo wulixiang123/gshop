@@ -2,8 +2,9 @@
   <el-card class="box-card">
     <template #header>                          <!-- 此回调打开弹框 -->
         <!-- <el-button type="primary" :icon="Plus" @click="addTrademark">添加</el-button> -->
-        <el-button v-if="userInfoStore.userInfo.buttons.includes('btn.Trademark.add')" type="primary" :icon="Plus" @click="addTrademark">添加</el-button>
-    </template>
+        <!-- <el-button v-if="userInfoStore.userInfo.buttons.includes('btn.Trademark.add')" type="primary" :icon="Plus" @click="addTrademark">添加</el-button> -->
+        <el-button v-permissionbtn="'btn.Trademark.add'" type="primary" :icon="Plus" @click="addTrademark">添加</el-button>
+      </template>
     <!-- 
       当 el-table 元素中注入 data 对象数组后，
       在 el-table-column 中用 prop 属性来对应对象中的键名即可填入数据，

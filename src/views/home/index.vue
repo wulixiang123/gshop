@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    Hello, {{userInfoStore.userInfo.name}}
+    <!-- Hello, {{userInfoStore.userInfo.name}} -->
+    {{ echartsStore.echartsData }}
   </div>
 </template>
 
@@ -10,10 +11,14 @@ export default {
 }
 </script>
 <script lang="ts" setup>
-import { useUserInfoStore } from '@/stores/userInfo';
+import useEchartsStore from '@/stores/echarts';
+import { onMounted } from 'vue';
+const echartsStore = useEchartsStore()
 
-const userInfoStore = useUserInfoStore()
 
+onMounted(()=>{
+  echartsStore.getEchartsData()
+})
 </script>
 
 <style scoped>
@@ -21,6 +26,5 @@ const userInfoStore = useUserInfoStore()
     width: 100%;
     height: 100%;
     padding: 20px;
-    font-size: 30px;
   }
 </style>

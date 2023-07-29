@@ -8,6 +8,7 @@ import router from './router' // 路由
 import './styles/index.scss' // 全局样式
 import ElSvg from './components/SvgIcon/ElSvg' // svg图标的组件(放一放)
 import './permission' // 路由守卫
+import '@/mock'
 
 const app = createApp(App)
 

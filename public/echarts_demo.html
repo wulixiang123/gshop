@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!--
+    第一步:下载安装
+        npm i echarts
+    第二步: 引入echarts
+  -->
+    <script src="../node_modules/echarts/dist/echarts.js"></script>
+</head>
+<body>
+    <!-- 第三步: 准备容器(必须有宽高) -->
+  <div id="main" style="width: 600px;height: 400px;"></div>
+  <script>
+    // 第四步: 创建实例
+    var myChart = echarts.init(document.getElementById('main'))
+
+    var option = {
+      // 图标的标题
+      title: {
+        text: 'ECharts 入门示例' // 标题文本
+      },
+      tooltip: {}, // 鼠标移入图标的提示信息
+      // 图例
+      legend: {
+        data: ['销量', '价格']
+      },
+      // x轴
+      xAxis: {
+        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子', '方便面']
+      },
+      // y轴
+      yAxis: {},
+      // 图表的数据
+      series: [
+        {
+          name: '销量',
+          type: 'bar', // 图的类型  bar是柱状图 line是折线图
+          data: [5, 20, 36, 10, 10, 20, 40] // 图的数据
+        },
+        {
+          name: '价格',
+          type: 'bar', // 图的类型  bar是柱状图 line是折线图
+          data: [40, 60, 65, 35, 5, 3, 4.5] // 图的数据
+        }
+      ]
+    };
+
+    // 第五步: 给实例写入配置项
+    myChart.setOption(option)
+    </script>
+</body>
+</html>

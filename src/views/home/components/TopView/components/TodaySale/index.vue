@@ -1,28 +1,43 @@
 <template>
-  <CommonCard title="今日销售额" :count="303455555">
+  <CommonCard title="今日销售额" :count="salesToday">
     <template #main>
       <div class="main">
         <div class="content">
           <span class="mr-5">同日比</span>
-          <span class="mr-5">-19.16</span>
+          <span class="mr-5">{{ salesGrowthLastDay  }}</span>
           <span class="icon down"></span>
         </div>
         <div class="content">
           <span class="mr-5">月同比</span>
-          <span class="mr-5">56.66</span>
+          <span class="mr-5">{{salesGrowthLastMonth}} </span>
           <span class="icon up"></span>
         </div>
       </div>
     </template>
     <template #bottom>
       <span class="mr-10">昨日销售额</span>
-      <span>36000000</span>
+      <span>{{ salesLastDay }}</span>
     </template>
   </CommonCard>
 </template>
   
   <script setup lang="ts">
+  import { computed } from 'vue';
   import CommonCard from '../CommonCard/index.vue'
+  import useEchartsStore from '@/stores/echarts';
+  const echartsStore = useEchartsStore()
+  const salesToday = computed(()=>{
+    return echartsStore.echartsData.salesLastDay
+  })
+  const salesLastDay = computed(()=>{
+    return echartsStore.echartsData.salesLastDay
+  })
+  const salesGrowthLastDay = computed(()=>{
+    return echartsStore.echartsData.salesGrowthLastDay
+  })
+  const salesGrowthLastMonth = computed(()=>{
+    return echartsStore.echartsData.salesGrowthLastMonth
+  })
   </script>
   
   <style lang="scss" scoped>

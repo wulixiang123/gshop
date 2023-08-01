@@ -12,6 +12,9 @@ import '@/mock'
 
 const app = createApp(App)
 
+import { vueEcharts } from '@/plugins/echarts'
+app.use(vueEcharts)
+
 import CategorySelector from '@/components/CategorySelector/index.vue'
 app.component('CategorySelector', CategorySelector)
 

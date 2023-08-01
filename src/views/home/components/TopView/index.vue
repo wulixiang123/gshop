@@ -7,7 +7,7 @@
         <TodayOrder></TodayOrder>
       </el-col>
       <el-col :span="6">
-        交易用户数
+        <UserSale></UserSale>
       </el-col>
       <el-col :span="6">
         累计用户数
@@ -18,6 +18,7 @@
   <script setup lang="ts">
   import TodaySale from './components/TodaySale/index.vue'
   import TodayOrder from './components/TodayOrder/index.vue'
+  import UserSale from './components/UserSale/index.vue'
   </script>
   
   <style scoped>

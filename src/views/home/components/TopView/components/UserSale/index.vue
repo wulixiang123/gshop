@@ -21,7 +21,7 @@ const orderUser = computed(()=>{
 })
 
 const returnRate = computed(()=>{
-    return echartsStore.echartsData.orderUserTrend
+    return echartsStore.echartsData.returnRate
 })
 
 const orderUserTrend = computed(()=>{

@@ -10,7 +10,7 @@
         <UserSale></UserSale>
       </el-col>
       <el-col :span="6">
-        累计用户数
+        <userTotal></userTotal>
       </el-col>
     </el-row>
   </template>
@@ -19,6 +19,7 @@
   import TodaySale from './components/TodaySale/index.vue'
   import TodayOrder from './components/TodayOrder/index.vue'
   import UserSale from './components/UserSale/index.vue'
+  import userTotal from './components/UserRotal.vue'
   </script>
   
   <style scoped>

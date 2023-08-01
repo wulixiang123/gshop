@@ -13,9 +13,11 @@
   <script setup lang="ts">
   // 引入
   import { $echarts } from '@/plugins/echarts'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
   import CommonCard from '../CommonCard/index.vue'
   import useEchartsStore from '@/stores/echarts'
+  import type { EChartsType } from 'echarts'
+  import { debounce } from 'lodash'
   const echartsStore = useEchartsStore()
   
   
@@ -72,19 +74,31 @@
     ]
   })
   
-  
-  const myCharts = ref() // 存Echarts实例
-  const chartsRef = ref() // 获取到echarts容器的DOM
+
+  // 优化二: 防抖节流
+  const resizeHandler = debounce(()=>{
+    myCharts.value?.resize()
+  },500)
+
+
+  const myCharts = ref<EChartsType>() // 存Echarts实例
+  const chartsRef = ref<HTMLDivElement>() // 获取到echarts容器的DOM
   onMounted(() => {
     myCharts.value = $echarts.init(chartsRef.value) // 第四步
   
     myCharts.value.setOption( setOptions() )
+    // 优化一: 当窗口发生变化的时候,图表也跟着变
+    window.addEventListener('resize',resizeHandler)
+  })
+
+  onUnmounted(()=>{
+    window.removeEventListener('resize',resizeHandler)
   })
   
   // 问题: 刷新发现页面不显示图表,只要稍许改动保存页面就显示
   //       问题出在数据是异步的
   watch(orderToday, () => {
-    myCharts.value.setOption(setOptions())
+    myCharts.value?.setOption(setOptions())
   })
   
   

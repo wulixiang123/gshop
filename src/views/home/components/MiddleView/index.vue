@@ -5,7 +5,7 @@
       :default-active="activeIndex"
       class="menu"
       mode="horizontal"
-      @selsct="selectHandler"
+      @select="selectHandler"
       >
       <el-menu-item index="1">销售量</el-menu-item>
       <el-menu-item index="2">访问量</el-menu-item>
@@ -36,7 +36,7 @@
         <LeftView :activeIndex="activeIndex"></LeftView>
       </el-col>
       <el-col :span="6">
-        <RightView></RightView>
+        <RightView :activeIndex="activeIndex"></RightView>
       </el-col>
     </el-row>
 

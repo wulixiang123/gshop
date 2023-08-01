@@ -1,7 +1,7 @@
 <template>
     <CommonCard title="累计用户数" :count="1177885">
       <template #main>
-        <v-chart :option="setOptions()"></v-chart>
+        <v-chart :option="setOptions()" autoresize></v-chart>
       </template>
       <template #bottom>
         <div class="btm">

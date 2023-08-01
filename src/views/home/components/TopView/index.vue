@@ -19,7 +19,7 @@
   import TodaySale from './components/TodaySale/index.vue'
   import TodayOrder from './components/TodayOrder/index.vue'
   import UserSale from './components/UserSale/index.vue'
-  import userTotal from './components/UserRotal.vue'
+  import userTotal from './components/UserTotal.vue'
   </script>
   
   <style scoped>

@@ -1,5 +1,5 @@
 <template>
-<v-chart class="chart" :option="setOptions(activeIndex)"></v-chart>
+<v-chart class="chart" :option="setOptions(activeIndex)" autoresize></v-chart>
 </template>
 
 <script setup lang="ts">

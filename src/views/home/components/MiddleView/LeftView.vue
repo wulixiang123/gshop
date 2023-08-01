@@ -48,7 +48,8 @@ const setOptions = (activeIndex:string)=>{
         yAxis:{},
         series:[
             {
-                name:activeIndex == '1'?'销售趋势':'访问趋势',
+                // name:activeIndex == '1'?'销售趋势':'访问趋势',
+                name:'销售趋势',
                 type:'bar',
                 barWidth:'30%',
                 data:activeIndex == '1'?orderFullYear.value:userFullYear.value

@@ -1,5 +1,5 @@
 <template>
-<div class="order-list">
+<div class="order-list" v-loading="isLoading">
     <div class="card operate mb-10">
         <el-button class="mb-5" type="primary" size="small">签收</el-button>
         <el-button class="mb-5" type="primary" size="small">批量签收</el-button>
@@ -55,11 +55,109 @@
             <el-button type="primary" size="small" :icon="Sort"></el-button>
         </div>
     </div>
+
+    <!-- 主表区域 -->
+    <div class="card main mb-10">
+        <div class="operate">
+            <el-tooltip effect="dark" content="打印" placement="top">
+                <el-icon><Printer/></el-icon>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="导出" placement="top">
+                <el-icon><DocumentAdd/></el-icon>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="全屏" placement="top">
+                <el-icon><FullScreen/></el-icon>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="刷新" placement="top">
+                <el-icon><Refresh/></el-icon>
+            </el-tooltip>
+            <el-tooltip effect="dark" content="设置" placement="top">
+                <el-icon><Setting/></el-icon>
+            </el-tooltip>
+        </div>
+        <el-table border size="small" class="maintable mb-5">
+            <el-table-column type="selection" width="55"></el-table-column>
+            <el-table-column label="订单号" width="100"></el-table-column>
+            <el-table-column label="交易编号" width="200"></el-table-column>
+            <el-table-column label="订单状态" width="100"></el-table-column>
+            <el-table-column label="支付方式" width="100"></el-table-column>
+            <el-table-column label="金额" width="100"></el-table-column>
+            <el-table-column label="收货人" width="100"></el-table-column>
+            <el-table-column label="收货人电话" width="160"></el-table-column>
+            <el-table-column label="创建时间" width="160"></el-table-column>
+            <el-table-column label="收货人地址"></el-table-column>
+        </el-table>
+
+        <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="limit"
+        :total="total"
+        :page-sizes="[10, 20, 50]"
+        layout="prev, pager, next, jumper, ->, sizes ,total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
+
+    <!-- 副表区域 -->
+    <el-tabs type="border-card">
+        <el-tab-pane label="商品详情">
+            <el-table border size="small">
+                <el-table-column type="index" label="序号" width="55"/>
+                <el-table-column label="商品ID" width="160"/>
+                <el-table-column label="商品名称" width="260"/>
+                <el-table-column label="单价" width="100"/>
+                <el-table-column label="数量" width="100"/>
+                <el-table-column label="合计" width="100"/>
+                <el-table-column label="创建时间" width="160"/>
+                <el-table-column label="图片" width="160"></el-table-column>
+            </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="物流信息">无</el-tab-pane>
+        <el-tab-pane label="售后信息">无</el-tab-pane>
+    </el-tabs>
 </div>
 </template>
 
 <script setup lang="ts">
-import {RefreshRight,Search,Sort} from '@element-plus/icons-vue'
+import { RefreshRight, Search, Sort, Printer, DocumentAdd, FullScreen, Refresh, Setting } from '@element-plus/icons-vue'
+import orderApi,{type OrderModel,type GoodsModel} from '@/api/order'
+import { onMounted, ref } from 'vue';
+
+
+const isLoading = ref(false)
+const page = ref(1)
+const limit = ref(10)
+const total = ref(0)
+const orderList = ref<OrderModel[]>([])
+const goodsList = ref<GoodsModel[]>([])
+
+
+const handleSizeChange = (size:number) => {
+
+}
+const handleCurrentChange = (page:number) => {
+
+}
+
+
+const getPage = async() => {
+    isLoading.value = true
+    try {
+        let result = await orderApi.getPage(page.value,limit.value)
+        orderList.value = result.records
+        total.value = result.total
+        goodsList.value = result.records[0].orderDetailList// 副表数据(默认展示主表第一条数据订单的具体商品列表)
+        console.log(result);
+        
+    } finally{
+        isLoading.value = false
+    }
+}
+
+onMounted(()=>{
+    getPage()
+})
 </script>
 
 <style scoped lang="scss">
@@ -88,5 +186,15 @@ import {RefreshRight,Search,Sort} from '@element-plus/icons-vue'
             bottom: 28px;
         }
     }
+    .main {
+    .operate {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 5px;
+      .el-icon {
+        margin-left: 5px;
+      }
+    }
+  }
 }
 </style>

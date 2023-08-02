@@ -115,8 +115,8 @@ const save = () => {
     await router.replace('/acl/role/list')
     // 跳转完成后, 如果分配的是当前用户角色的权限, 刷新一下浏览器
     const roleName = route.query.roleName
-    console.log(userInfoStore.userinfo.roles, roleName)
-    if (userInfoStore.userinfo.roles.includes(roleName as string)) {
+    console.log(userInfoStore.userInfo.roles, roleName)
+    if (userInfoStore.userInfo.roles.includes(roleName as string)) {
       window.location.reload()
     }
   })

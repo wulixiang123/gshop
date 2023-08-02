@@ -70,8 +70,25 @@ export interface GoodsModel {
 
 
 
-export default{
-    getPage(page:number,limit:number){
-        return request.get<any,PageModel>(`/admin/order/${page}/${limit}`)
+
+
+    export interface SearchModel{
+        id: string
+        outTradeNo: string
+        consignee: string
+        consigneeTel: string
+        deliveryAddress: string
+        orderStatus: string
+        createTimeBegin: string
+        createTimeEnd: string
     }
+
+
+
+export default{
+    getPage(page:number,limit:number,data:SearchModel){
+        return request.get<any,PageModel>(`/admin/order/${page}/${limit}`,{
+            params:data// 注意:axios的config中的params指的是url问号之后的参数也就是query
+        })
+    },
 }

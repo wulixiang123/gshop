@@ -75,17 +75,17 @@
                 <el-icon><Setting/></el-icon>
             </el-tooltip>
         </div>
-        <el-table border size="small" class="maintable mb-5">
-            <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column label="订单号" width="100"></el-table-column>
-            <el-table-column label="交易编号" width="200"></el-table-column>
-            <el-table-column label="订单状态" width="100"></el-table-column>
-            <el-table-column label="支付方式" width="100"></el-table-column>
-            <el-table-column label="金额" width="100"></el-table-column>
-            <el-table-column label="收货人" width="100"></el-table-column>
-            <el-table-column label="收货人电话" width="160"></el-table-column>
-            <el-table-column label="创建时间" width="160"></el-table-column>
-            <el-table-column label="收货人地址"></el-table-column>
+        <el-table :data="orderList" border size="small" class="maintable mb-10">
+            <el-table-column type="selection" width="55" align="center"></el-table-column>
+            <el-table-column prop="id" label="订单号" width="100"></el-table-column>
+            <el-table-column prop="outTradeNo" label="交易编号" width="200"></el-table-column>
+            <el-table-column prop="orderStatusName" label="订单状态" width="100"></el-table-column>
+            <el-table-column prop="paymentWay" label="支付方式" width="100"></el-table-column>
+            <el-table-column prop="totalAmount" label="金额" width="100"></el-table-column>
+            <el-table-column prop="consignee" label="收货人" width="100"></el-table-column>
+            <el-table-column prop="consigneeTel" label="收货人电话" width="160"></el-table-column>
+            <el-table-column prop="createTime" label="创建时间" width="160"></el-table-column>
+            <el-table-column prop="deliveryAddress" label="收货人地址"></el-table-column>
         </el-table>
 
         <el-pagination
@@ -102,15 +102,19 @@
     <!-- 副表区域 -->
     <el-tabs type="border-card">
         <el-tab-pane label="商品详情">
-            <el-table border size="small">
+            <el-table :data="goodsList" border size="small">
                 <el-table-column type="index" label="序号" width="55"/>
-                <el-table-column label="商品ID" width="160"/>
-                <el-table-column label="商品名称" width="260"/>
-                <el-table-column label="单价" width="100"/>
-                <el-table-column label="数量" width="100"/>
-                <el-table-column label="合计" width="100"/>
-                <el-table-column label="创建时间" width="160"/>
-                <el-table-column label="图片" width="160"></el-table-column>
+                <el-table-column prop="skuId" label="商品ID" width="160"/>
+                <el-table-column prop="skuName" label="商品名称" width="260"/>
+                <el-table-column prop="orderPrice" label="单价" width="100"/>
+                <el-table-column prop="skuNum" label="数量" width="100"/>
+                <el-table-column prop="splitTotalAmount" label="合计" width="100"/>
+                <el-table-column prop="createTime" label="创建时间" width="160"/>
+                <el-table-column label="图片" width="160">
+                    <template #default="{row,$index}">
+                        <el-image :src="row.imgUrl" style="width: 60px;height: 60px;"></el-image>
+                    </template>
+                </el-table-column>
             </el-table>
         </el-tab-pane>
         <el-tab-pane label="物流信息">无</el-tab-pane>

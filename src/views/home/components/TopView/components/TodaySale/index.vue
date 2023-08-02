@@ -14,8 +14,8 @@
           <span class="mr-5">月同比</span>
           <span class="mr-5">{{salesGrowthLastMonth}} </span>
           <span class="icon" :class="{
-            down:salesGrowthLastDay < 0,
-            up:salesGrowthLastDay > 0
+            down:salesGrowthLastMonth < 0,
+            up:salesGrowthLastMonth > 0
           }"></span>
         </div>
       </div>

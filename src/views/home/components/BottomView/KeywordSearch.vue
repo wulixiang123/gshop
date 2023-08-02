@@ -17,7 +17,7 @@
         </el-col>
       </el-row>
   
-      <el-table :data="tableData" class="mb-10">
+      <el-table :data="tableData" class="mb-10" style="height: 240px;">
         <el-table-column type="index" label="排名" align="center" width="60"></el-table-column>
         <el-table-column prop="word" label="关键字" align="center"></el-table-column>
         <el-table-column prop="count" label="搜索数量" align="center"></el-table-column>

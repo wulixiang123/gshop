@@ -154,6 +154,33 @@ export const allAsyncRoutes: Array<RouteRecordRaw> = [
             }
           }
         ]
+      },
+      {
+        path:'/order',
+        name:'Order',
+        component:()=>import('@/layout/index.vue'),
+        meta:{
+          title:'订单管理',
+          icon:'ele-GoodsFilled'
+        },
+        children:[
+          {
+            path:'orderlist',
+            name:'OrderList',
+            component:()=>import('@/views/order/orderlist.vue'),
+            meta:{
+              title:'订单列表'
+            }
+          },
+          {
+            path:'refund',
+            name:'Refund',
+            component:()=>import('@/views/order/refund.vue'),
+            meta:{
+              title:'退款管理'
+            }
+          }
+        ]
       }
     ]
 

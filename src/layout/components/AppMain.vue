@@ -22,6 +22,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+  background: var(--el-bg-color-page);
 }
 .fixed-header+.app-main {
   padding-top: 50px;

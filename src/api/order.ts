@@ -91,4 +91,7 @@ export default{
             params:data// 注意:axios的config中的params指的是url问号之后的参数也就是query
         })
     },
+    sign(orderId:number){
+        return request.get<any,null>(`/admin/order/recieve/${ orderId }`)
+    }
 }

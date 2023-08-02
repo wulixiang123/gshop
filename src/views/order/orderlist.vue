@@ -1,7 +1,7 @@
 <template>
 <div class="order-list" v-loading="isLoading">
     <div class="card operate mb-10">
-        <el-button class="mb-5" type="primary" size="small">签收</el-button>
+        <el-button class="mb-5" type="primary" size="small" @click="signHandler">签收</el-button>
         <el-button class="mb-5" type="primary" size="small">批量签收</el-button>
         <el-button class="mb-5" type="primary" size="small">审单</el-button>
         <el-button class="mb-5" type="primary" size="small">批量审单</el-button>
@@ -84,6 +84,7 @@
         highlight-current-row
         @row-click="showOrderDetail"
         ref="mainTableRef"
+        @select="selectOrder"
         >
             <el-table-column type="selection" width="55" align="center"></el-table-column>
             <el-table-column prop="id" label="订单号" width="100"></el-table-column>
@@ -137,6 +138,29 @@ import { RefreshRight, Search, Sort, Printer, DocumentAdd, FullScreen, Refresh, 
 import orderApi,{type OrderModel,type GoodsModel,type SearchModel} from '@/api/order'
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash'
+import { ElMessage } from 'element-plus';
+
+
+
+// 签收
+const signHandler = async () => {
+    if(selOrderList.value.length != 1){
+        ElMessage.error('只能签收一个订单,如果签收多个订单请使用[批量签收]')
+        return
+    }
+    await orderApi.sign(selOrderList.value[0].id)
+    ElMessage.success('签收成功')
+    getPage()
+}
+// 选中订单的列表
+const selOrderList = ref<OrderModel[]>([])
+const selectOrder  = (list:OrderModel[])=>{
+    selOrderList.value = list// 存一下选中的订单列表
+}
+
+
+
+
 
 // 交互3.2
 const showOrderDetail = (row: OrderModel) => {

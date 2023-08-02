@@ -5,12 +5,18 @@
         <div class="content">
           <span class="mr-5">同日比</span>
           <span class="mr-5">{{ salesGrowthLastDay }}</span>
-          <span class="icon down"></span>
+          <span class="icon" :class="{
+            down:salesGrowthLastDay < 0,
+            up:salesGrowthLastDay > 0
+          }"></span>
         </div>
         <div class="content">
           <span class="mr-5">月同比</span>
           <span class="mr-5">{{salesGrowthLastMonth}} </span>
-          <span class="icon up"></span>
+          <span class="icon" :class="{
+            down:salesGrowthLastDay < 0,
+            up:salesGrowthLastDay > 0
+          }"></span>
         </div>
       </div>
     </template>
@@ -56,21 +62,21 @@ const salesGrowthLastMonth = computed(() => {
       align-items: center;
     }
   }
-  // 箭头
-  .down {
-    margin-top: 5px;
-    display: inline-block;
-    border: 5px solid blue;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-  }
-  .up {
-    margin-top: -5px;
-    display: inline-block;
-    border: 5px solid red;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    border-top-color: transparent;
-  }
+  // // 箭头
+  // .down {
+  //   margin-top: 5px;
+  //   display: inline-block;
+  //   border: 5px solid blue;
+  //   border-left-color: transparent;
+  //   border-right-color: transparent;
+  //   border-bottom-color: transparent;
+  // }
+  // .up {
+  //   margin-top: -5px;
+  //   display: inline-block;
+  //   border: 5px solid red;
+  //   border-left-color: transparent;
+  //   border-right-color: transparent;
+  //   border-top-color: transparent;
+  // }
   </style>

@@ -22,6 +22,22 @@
   import userTotal from './components/UserTotal.vue'
   </script>
   
-  <style scoped>
-  
+  <style scoped lang="scss">
+  // 箭头
+::v-deep(.down) {
+  margin-top: 5px;
+  display: inline-block;
+  border: 5px solid blue;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
+::v-deep(.up) {
+  margin-top: -5px;
+  display: inline-block;
+  border: 5px solid red;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-top-color: transparent;
+}
   </style>

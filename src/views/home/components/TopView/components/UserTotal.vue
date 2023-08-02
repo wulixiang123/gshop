@@ -1,5 +1,5 @@
 <template>
-    <CommonCard title="累计用户数" :count="1177885">
+    <CommonCard title="累计用户数" :count="usersTotal">
       <template #main>
         <v-chart :option="setOptions()" autoresize></v-chart>
       </template>
@@ -7,13 +7,19 @@
         <div class="btm">
           <div class="content">
             <span class="mr-5">日同比</span>
-            <span class="mr-5">17.71</span>
-            <span class="icon up"></span>
+            <span class="mr-5">{{ userGrowthLastDay }}</span>
+            <span class="icon" :class="{
+            down:+userGrowthLastDay < 0,
+            up:+userGrowthLastDay > 0
+          }"></span>
           </div>
           <div class="content">
             <span class="mr-5">月同比</span>
-            <span class="mr-5">-47.12</span>
-            <span class="icon down"></span>
+            <span class="mr-5">{{ userGrowthLastMonth }}</span>
+            <span class="icon" :class="{
+            down:+userGrowthLastMonth < 0,
+            up:+userGrowthLastMonth > 0
+          }"></span>
           </div>
         </div>
       </template>
@@ -100,21 +106,21 @@
     }
   }
   
-  // 箭头
-  .down {
-    margin-top: 5px;
-    display: inline-block;
-    border: 5px solid blue;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-  }
-  .up {
-    margin-top: -5px;
-    display: inline-block;
-    border: 5px solid red;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    border-top-color: transparent;
-  }
+  // // 箭头
+  // .down {
+  //   margin-top: 5px;
+  //   display: inline-block;
+  //   border: 5px solid blue;
+  //   border-left-color: transparent;
+  //   border-right-color: transparent;
+  //   border-bottom-color: transparent;
+  // }
+  // .up {
+  //   margin-top: -5px;
+  //   display: inline-block;
+  //   border: 5px solid red;
+  //   border-left-color: transparent;
+  //   border-right-color: transparent;
+  //   border-top-color: transparent;
+  // }
   </style>

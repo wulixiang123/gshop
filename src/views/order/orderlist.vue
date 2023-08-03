@@ -2,7 +2,7 @@
 <div class="order-list" v-loading="isLoading">
     <div class="card operate mb-10">
         <el-button class="mb-5" type="primary" size="small" @click="signHandler">签收</el-button>
-        <el-button class="mb-5" type="primary" size="small">批量签收</el-button>
+        <el-button class="mb-5" type="primary" size="small" @click="batchSignHandler">批量签收</el-button>
         <el-button class="mb-5" type="primary" size="small">审单</el-button>
         <el-button class="mb-5" type="primary" size="small">批量审单</el-button>
         <el-button class="mb-5" type="primary" size="small">拆单</el-button>
@@ -130,6 +130,19 @@
         <el-tab-pane label="物流信息">无</el-tab-pane>
         <el-tab-pane label="售后信息">无</el-tab-pane>
     </el-tabs>
+
+
+    <!-- 批量操作 -->
+    <el-dialog v-model="showDialog">
+        <el-table :data="tableData" border size="small">
+            <el-table-column type="index" label="序号" width="55" align="center"></el-table-column>
+            <el-table-column prop="orderId" label="订单号" align="center"></el-table-column>
+            <el-table-column prop="status" label="操作状态" align="center"></el-table-column>
+            <el-table-column prop="errorMessage" label="失败原因" align="center"></el-table-column>
+        </el-table>
+    </el-dialog>
+
+
 </div>
 </template>
 
@@ -139,6 +152,41 @@ import orderApi,{type OrderModel,type GoodsModel,type SearchModel} from '@/api/o
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash'
 import { ElMessage } from 'element-plus';
+
+
+
+const showDialog = ref(false)
+const tableData = ref<{
+    orderId:number
+    status:string
+    errorMessage:string
+}[]>([])
+
+
+
+
+// 批量签收
+const batchSignHandler = () => {
+    // 发请求
+    selOrderList.value.forEach(async order=>{
+        try {
+            await orderApi.sign(order.id)
+            tableData.value.push({
+                orderId:order.id,
+                status:'成功',
+                errorMessage:''
+            })
+        } catch (error) {
+            tableData.value.push({
+                orderId:order.id,
+                status:'失败',
+                errorMessage:(error as any).message || '请求失败'
+            })
+        }
+    })
+    showDialog.value = true
+}
+
 
 
 

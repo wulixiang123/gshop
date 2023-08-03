@@ -148,6 +148,12 @@ const signHandler = async () => {
         ElMessage.error('只能签收一个订单,如果签收多个订单请使用[批量签收]')
         return
     }
+
+    if(selOrderList.value[0].orderStatus == 'FINISHED'){
+        ElMessage.error('已被签收~')
+        return
+    }
+
     await orderApi.sign(selOrderList.value[0].id)
     ElMessage.success('签收成功')
     getPage()

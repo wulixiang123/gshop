@@ -113,7 +113,8 @@
     },
     series: [
       {
-        name: 'Access From',
+        // name: 'Access From',
+        name:radio.value == '品类'?'品类分布':'商品分布',// name属性变化图表会重新绘制
         type: 'pie', // bar  line  pie饼图
         radius: ['50%', '70%'], // 内圆和外圆得半径
         // right: '10%',

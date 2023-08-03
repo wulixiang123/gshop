@@ -133,15 +133,21 @@
 
 
     <!-- 批量操作 -->
-    <el-dialog v-model="showDialog">
+    <!-- <el-dialog v-model="showDialog">
         <el-table :data="tableData" border size="small">
             <el-table-column type="index" label="序号" width="55" align="center"></el-table-column>
             <el-table-column prop="orderId" label="订单号" align="center"></el-table-column>
             <el-table-column prop="status" label="操作状态" align="center"></el-table-column>
             <el-table-column prop="errorMessage" label="失败原因" align="center"></el-table-column>
         </el-table>
-    </el-dialog>
+    </el-dialog> -->
 
+
+    <BatchOperat
+    v-model="showDialog"
+    :config="config"
+    @close="closeDialog"
+    ></BatchOperat>
 
 </div>
 </template>
@@ -152,41 +158,56 @@ import orderApi,{type OrderModel,type GoodsModel,type SearchModel} from '@/api/o
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash'
 import { ElMessage } from 'element-plus';
+import BatchOperat from '@/components/BatchOperat.vue'
 
 
 
+
+
+
+
+
+
+
+const config = ref()
 const showDialog = ref(false)
-const tableData = ref<{
-    orderId:number
-    status:string
-    errorMessage:string
-}[]>([])
-
-
-
-
+// const tableData = ref<{
+//     orderId:number
+//     status:string
+//     errorMessage:string
+// }[]>([])
 // 批量签收
 const batchSignHandler = () => {
     // 发请求
-    selOrderList.value.forEach(async order=>{
-        try {
-            await orderApi.sign(order.id)
-            tableData.value.push({
-                orderId:order.id,
-                status:'成功',
-                errorMessage:''
-            })
-        } catch (error) {
-            tableData.value.push({
-                orderId:order.id,
-                status:'失败',
-                errorMessage:(error as any).message || '请求失败'
-            })
-        }
-    })
-    showDialog.value = true
+    // selOrderList.value.forEach(async order=>{
+    //     try {
+    //         await orderApi.sign(order.id)
+    //         tableData.value.push({
+    //             orderId:order.id,
+    //             status:'成功',
+    //             errorMessage:''
+    //         })
+    //     } catch (error) {
+    //         tableData.value.push({
+    //             orderId:order.id,
+    //             status:'失败',
+    //             errorMessage:(error as any).message || '请求失败'
+    //         })
+    //     }
+    // })
+
+    config.value = {
+        isFor:true,
+        apiFn:orderApi.sign,
+        params:selOrderList.value.map(order => order.id),
+        title:'订单号'
+    }
+    showDialog.value = true// 展示弹框
 }
 
+const closeDialog = () => {
+    getPage()
+}
 
 
 

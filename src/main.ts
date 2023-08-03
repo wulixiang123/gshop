@@ -12,6 +12,10 @@ import '@/mock'
 
 const app = createApp(App)
 
+import BatchOperat from '@/components/BatchOperat.vue'
+app.component('BatchOperat',BatchOperat)
+
+
 import { vueEcharts } from '@/plugins/echarts'
 app.use(vueEcharts)
 

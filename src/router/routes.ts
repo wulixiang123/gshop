@@ -179,6 +179,14 @@ export const allAsyncRoutes: Array<RouteRecordRaw> = [
             meta:{
               title:'退款管理'
             }
+          },
+          {
+            path:'draggable',
+            name:'Draggable',
+            component:()=>import('@/views/order/draggable/index.vue'),
+            meta:{
+              title:'draggable使用'
+            }
           }
         ]
       }
